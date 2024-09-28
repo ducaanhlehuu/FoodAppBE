@@ -37,4 +37,9 @@ build/
 
 ### VS Code ###
 .vscode/
+<<<<<<< HEAD
 
+=======
+/src/main/resources/ca.pem
+/src/main/resources/application.yml
+>>>>>>> 7abf4a3 (123)
