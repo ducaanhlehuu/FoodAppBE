@@ -1,11 +1,13 @@
 package com.shop.food.security;
 
 
+import com.shop.food.entity.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,6 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfiguration {
@@ -28,7 +31,7 @@ public class SecurityConfiguration {
         httpSecurity
                   .csrf(AbstractHttpConfigurer::disable)
                   .authorizeHttpRequests((authorize) -> authorize
-                          .requestMatchers("/api/v1/auth/**","/hello").permitAll()
+                          .requestMatchers("/api/user/auth/**").permitAll()
                           .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                           .anyRequest().authenticated())
                   .sessionManagement(session -> session

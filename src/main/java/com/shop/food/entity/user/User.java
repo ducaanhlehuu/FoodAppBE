@@ -1,7 +1,8 @@
-package com.shop.food.model.user;
+package com.shop.food.entity.user;
 
-import com.shop.food.model.BaseEntity;
-import com.shop.food.model.FamilyGroup;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.shop.food.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,14 +25,26 @@ public class User extends BaseEntity implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
     private String fullName;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 32)
     private String phoneNumber;
+    @Column(length = 256)
+    @JsonIgnore
     private String password;
+    private Integer timeZone;
+    @Column(length = 4)
+    private String language;
+    @Column(length = 32)
+    private String deviceId;
+    @Column(length = 256)
+    private String photoUrl;
+    @Column(length = 108)
+    private String verificationCode;
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER;
 
-    @ManyToMany(mappedBy = "familyMembers")
-    private List<FamilyGroup> familyGroups;
+    @ManyToMany(mappedBy = "members",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Group> groups;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

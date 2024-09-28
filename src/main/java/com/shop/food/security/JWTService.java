@@ -22,7 +22,6 @@ public class JWTService {
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())

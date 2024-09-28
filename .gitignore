@@ -13,6 +13,11 @@ target/
 .springBeans
 .sts4-cache
 
+
+/src/main/resources/ca.pem
+/src/main/resources/application.yml
+
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
@@ -31,4 +36,4 @@ build/
 
 ### VS Code ###
 .vscode/
-/src/main/resources/ca.pem
+

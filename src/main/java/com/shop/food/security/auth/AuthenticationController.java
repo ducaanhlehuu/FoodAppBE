@@ -1,11 +1,10 @@
 package com.shop.food.security.auth;
 
+import com.shop.food.service.EmailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -13,11 +12,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @RestController
-@RequestMapping("api/v1/auth")
+@RequestMapping("api/user/auth")
 @RequiredArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationService service;
+    private final EmailService emailService;
 
     @Operation(summary = "Register", description = "Thêm mới tài khoản.")
     @ApiResponses(value = {
@@ -41,5 +41,13 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(service.authenticate(request));
+    }
+
+    @PostMapping("/send-verification-code")
+    public ResponseEntity<AuthenticationResponse> sendEmail(@RequestParam("email") String email, @Param("lang") String lang) {
+        String subject = lang.equalsIgnoreCase("en") ? "Welcome ..." : "Xin chao";
+        String body = "<h1>Hello</h1>";
+        emailService.sendEmail(email,subject, body);
+        return ResponseEntity.ok(null);
     }
 }

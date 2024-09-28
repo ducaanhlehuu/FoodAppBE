@@ -11,5 +11,7 @@ public class RegisterRequest {
     private String phoneNumber;
     private String fullName;
     private String password;
-
+    private String language;
+    private Integer timeZone;
+    private String deviceId;
 }
