@@ -16,11 +16,7 @@ target/
 
 /src/main/resources/ca.pem
 /src/main/resources/application.yml
-<<<<<<< HEAD
 src/main/resources/application.yml
-=======
->>>>>>> 6d6268c (change)
-
 
 ### IntelliJ IDEA ###
 .idea
