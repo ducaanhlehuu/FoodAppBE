@@ -16,7 +16,10 @@ target/
 
 /src/main/resources/ca.pem
 /src/main/resources/application.yml
+<<<<<<< HEAD
 src/main/resources/application.yml
+=======
+>>>>>>> 6d6268c (change)
 
 
 ### IntelliJ IDEA ###
@@ -38,6 +41,7 @@ build/
 ### VS Code ###
 .vscode/
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 /src/main/resources/ca.pem
@@ -45,5 +49,7 @@ build/
 <<<<<<< HEAD
 >>>>>>> 7abf4a3 (123)
 =======
+=======
+>>>>>>> 6d6268c (change)
 
 >>>>>>> 2da2073 (1233)
