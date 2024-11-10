@@ -8,8 +8,8 @@ import com.shop.food.entity.food.MeasureUnit;
 import java.util.List;
 
 public interface FoodService {
-    Food createFood(FoodDto food);
-    Food updateFood(FoodDto food, Integer id);
+    Food createFood(FoodDto food, String imageUrl);
+    Food updateFood(FoodDto food, Integer id, String imageUrl);
     void deleteFood(Integer foodId);
     List<Food> getAllFoodsInGroup(Integer groupId);
     Food getFoodById(Integer foodId);

@@ -1,4 +1,4 @@
-package com.shop.food.security;
+package com.shop.food.security.configuration;
 
 import com.shop.food.reposistory.UserRepository;
 import lombok.RequiredArgsConstructor;

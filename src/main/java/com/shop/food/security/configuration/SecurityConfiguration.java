@@ -1,8 +1,7 @@
-package com.shop.food.security;
+package com.shop.food.security.configuration;
 
 
-import com.shop.food.entity.user.Role;
-import lombok.AllArgsConstructor;
+import com.shop.food.security.JWTAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

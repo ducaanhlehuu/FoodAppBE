@@ -10,6 +10,7 @@ import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.security.JWTService;
 import com.shop.food.service.iservice.GroupService;
+import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
@@ -40,7 +41,7 @@ public class GroupController {
 
     @GetMapping("/{groupId}")
     public ResponseEntity<ResponseBody> getGroupById(@PathVariable Integer groupId) throws UnauthorizedException {
-        String userEmail = getAuthenticatedUserEmail();
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group group = groupService.getGroup(groupId);
         if (group == null) {
             return new ResponseEntity<>(new ResponseBody("Not found group", "", null), HttpStatus.NOT_FOUND);
@@ -50,7 +51,7 @@ public class GroupController {
 
     @GetMapping("/all")
     public ResponseEntity<ResponseBody> getAllGroupByUserId() throws UnauthorizedException {
-        String userEmail = getAuthenticatedUserEmail();
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
         List<Group> groups = userDetailsService.loadUserByUsername(userEmail).getAuthorities().contains(Role.ADMIN.name()) ?
                 groupService.getAllGroup() :
                 groupService.getAllGroupByUserEmail(userEmail);
@@ -60,7 +61,7 @@ public class GroupController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseBody> createGroup(@RequestParam String name, @RequestParam String description) throws UnauthorizedException {
-        String username = getAuthenticatedUserEmail();
+        String username = ServerUtil.getAuthenticatedUserEmail();
         Group group = new Group();
         group.setName(name);
         group.setDescription(description);
@@ -74,7 +75,7 @@ public class GroupController {
 
     @PostMapping
     public ResponseEntity<ResponseBody> updateGroup(@RequestBody Group group) throws UnauthorizedException {
-        String userEmail = getAuthenticatedUserEmail();
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group existedGroup = groupService.getGroup(group.getId());
         if (existedGroup == null) {
             return new ResponseEntity<>(new ResponseBody("Not found group", "", null), HttpStatus.NOT_FOUND);
@@ -87,7 +88,7 @@ public class GroupController {
 
     @DeleteMapping("/{groupId}")
     public ResponseEntity<ResponseBody> deleteGroup(@PathVariable Integer groupId) throws UnauthorizedException {
-        String userEmail = getAuthenticatedUserEmail();
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);
         if (!groupService.deleteGroup(groupId)) {
@@ -107,7 +108,7 @@ public class GroupController {
 
     @PostMapping("/{groupId}/members/{userId}")
     public ResponseEntity<ResponseBody> addMemberToGroup(@PathVariable Integer groupId, @PathVariable Integer userId) throws UnauthorizedException {
-        String userEmail = getAuthenticatedUserEmail();
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);
         Group group = groupService.addMemberToGroup(groupId, userId);
@@ -116,18 +117,11 @@ public class GroupController {
 
     @DeleteMapping("/{groupId}/members/{userId}")
     public ResponseEntity<ResponseBody> removeMemberFromGroup(@PathVariable Integer groupId, @PathVariable Integer userId) throws UnauthorizedException {
-        String userEmail = getAuthenticatedUserEmail();
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);
         Group group = groupService.removeMemberInGroup(groupId, userId);
         return new ResponseEntity<>(new ResponseBody("Remove member successfully", "", group), HttpStatus.OK);
     }
-
-    private String getAuthenticatedUserEmail() throws UnauthorizedException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails) {
-            return userDetails.getUsername();
-        }
-        throw new UnauthorizedException("Unauthorized");
-    }
+    
 }
