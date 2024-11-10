@@ -20,4 +20,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseBody, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ResponseBody> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        ResponseBody responseBody = new ResponseBody();
+        responseBody.setResultMessage(ex.getMessage());
+        responseBody.setResultCode("400");
+        responseBody.setData(null);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ResponseBody> handleUserNotFoundException(UserNotFoundException ex) {
+        ResponseBody responseBody = new ResponseBody();
+        responseBody.setResultMessage(ex.getMessage());
+        responseBody.setResultCode("400");
+        responseBody.setData(null);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+    }
+
 }

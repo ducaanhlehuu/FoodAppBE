@@ -1,15 +1,19 @@
 package com.shop.food.security.auth;
 
-import com.shop.food.service.EmailService;
+import com.shop.food.entity.response.ResponseBody;
+import com.shop.food.service.external.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/user/auth")
@@ -44,10 +48,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/send-verification-code")
-    public ResponseEntity<AuthenticationResponse> sendEmail(@RequestParam("email") String email, @Param("lang") String lang) {
-        String subject = lang.equalsIgnoreCase("en") ? "Welcome ..." : "Xin chao";
-        String body = "<h1>Hello</h1>";
-        emailService.sendEmail(email,subject, body);
-        return ResponseEntity.ok(null);
+    public ResponseEntity<ResponseBody> sendEmail(@RequestParam("email") String email, @Param("subject") String subject, @RequestParam("htmlContent") String htmlContent) {
+        String verificationCode = UUID.randomUUID().toString().substring(0, 16);
+        String body = !htmlContent.isEmpty() ? htmlContent
+                : "<h3>Xin chào, mã xác nhận của bạn là: " + "<span style='color:blue;font-weight:bold;'>" + verificationCode + "</span></h3>";;
+        try {
+            emailService.sendEmail(email, subject, body);
+        } catch (MailException e) {
+            return ResponseEntity.ok(new ResponseBody("Send Email Failed","", ""));
+        }
+        return ResponseEntity.ok(new ResponseBody("Send Email success","", verificationCode));
     }
 }

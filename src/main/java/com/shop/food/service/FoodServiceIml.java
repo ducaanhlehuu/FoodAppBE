@@ -21,10 +21,10 @@ public class FoodServiceIml implements FoodService {
     private final UserRepository userRepository;
 
     @Override
-    public Food createFood(FoodDto foodDto) {
+    public Food createFood(FoodDto foodDto, String imageUrl) {
         Food food = Food.builder()
                 .name(foodDto.getName())
-                .imageUrl(foodDto.getImageUrl())
+                .imageUrl(imageUrl)
                 .type(foodDto.getType())
                 .description(foodDto.getDescription())
                 .build();
@@ -36,14 +36,14 @@ public class FoodServiceIml implements FoodService {
     }
 
     @Override
-    public Food updateFood(FoodDto foodDto, Integer id) {
+    public Food updateFood(FoodDto foodDto, Integer id, String imageUrl) {
         Food exitedFood = foodRepository.findById(id).orElse(null);
         if(exitedFood==null) {
             return null;
         }
         exitedFood.setName(foodDto.getName());
         exitedFood.setDescription(foodDto.getDescription());
-        exitedFood.setImageUrl(foodDto.getImageUrl());
+        exitedFood.setImageUrl((imageUrl !=null && !imageUrl.isEmpty()) ? imageUrl : exitedFood.getImageUrl());
         exitedFood.setType(foodDto.getType());
         exitedFood.setMeasureUnit(this.getMeasureUnitByName(foodDto.getUnitName()));
         exitedFood.setFoodCategory(this.getFoodCategoryByAlias(foodDto.getFoodCategoryAlias()));
