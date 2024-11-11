@@ -1,7 +1,7 @@
 package com.shop.food.service;
 
 import com.shop.food.entity.food.MeasureUnit;
-import com.shop.food.reposistory.MeasureUnitRepository;
+import com.shop.food.repository.MeasureUnitRepository;
 import com.shop.food.service.iservice.MeasureUnitService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

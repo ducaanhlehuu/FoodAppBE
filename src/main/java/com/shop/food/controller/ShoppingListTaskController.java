@@ -60,6 +60,13 @@ public class ShoppingListTaskController {
         return new ResponseEntity<>(new ResponseBody("Shopping lists retrieved successfully", "Success", shoppingLists), HttpStatus.OK);
     }
 
+    @GetMapping("/{listId}")
+    public ResponseEntity<ResponseBody> getShoppingListById(@PathVariable Integer listId) throws ResourceNotFoundException {
+        ShoppingList shoppingList = shoppingListTaskService.getShoppingList(listId);
+        return new ResponseEntity<>(new ResponseBody("Shopping list retrieved successfully", "Success", shoppingList), HttpStatus.OK);
+    }
+
+
     @PostMapping("/task")
     public ResponseEntity<ResponseBody> createTask(@RequestParam Integer listId,@RequestBody TaskDto taskDto) throws ResourceNotFoundException {
         Task createdTask = shoppingListTaskService.createTask(taskDto, listId);

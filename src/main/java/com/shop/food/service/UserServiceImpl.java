@@ -3,7 +3,7 @@ package com.shop.food.service;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.PasswordNotMatchException;
 import com.shop.food.exception.UserNotFoundException;
-import com.shop.food.reposistory.UserRepository;
+import com.shop.food.repository.UserRepository;
 import com.shop.food.service.iservice.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;

@@ -1,6 +1,5 @@
-package com.shop.food.reposistory;
+package com.shop.food.repository;
 
-import com.shop.food.entity.food.Food;
 import com.shop.food.entity.shopping.ShoppingList;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

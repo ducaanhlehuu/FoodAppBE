@@ -22,11 +22,8 @@ public class MealPlan extends BaseEntity {
     private String timeStamp;
     private String status;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "food_id")
     private Food food;
-
-
 
     @ManyToOne()
     @JoinColumn(name = "owner_id")

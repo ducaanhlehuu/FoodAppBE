@@ -15,6 +15,7 @@ public interface ShoppingListTaskService {
     void deleteShoppingList(Integer listId);
     List<ShoppingList> getShoppingListByGroupId(Integer groupId);
     List<ShoppingList> getShoppingListByUserId(Integer userId);
+    ShoppingList getShoppingList(Integer listId) throws ResourceNotFoundException;
 
     Task createTask(TaskDto taskDto, Integer listId) throws ResourceNotFoundException;
     List<Task> createTasks(List<TaskDto> taskDtos, Integer listId) throws ResourceNotFoundException;

@@ -1,7 +1,7 @@
 package com.shop.food.service;
 
 import com.shop.food.entity.food.FoodCategory;
-import com.shop.food.reposistory.FoodCategoryRepository;
+import com.shop.food.repository.FoodCategoryRepository;
 import com.shop.food.service.iservice.FoodCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

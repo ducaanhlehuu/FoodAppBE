@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 
 public class ResponseBody {
-    private String resultMessage;
+    private String resultMessage; // Mình tiếng anh thôi
     private String resultCode;
     private Object data;
 }

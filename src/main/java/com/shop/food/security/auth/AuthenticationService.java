@@ -2,7 +2,7 @@ package com.shop.food.security.auth;
 
 import com.shop.food.entity.user.Role;
 import com.shop.food.entity.user.User;
-import com.shop.food.reposistory.UserRepository;
+import com.shop.food.repository.UserRepository;
 import com.shop.food.security.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;

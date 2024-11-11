@@ -2,7 +2,6 @@ package com.shop.food.service;
 
 import com.shop.food.dto.ShoppingListDto;
 import com.shop.food.dto.TaskDto;
-import com.shop.food.entity.BaseEntity;
 import com.shop.food.entity.food.Food;
 import com.shop.food.entity.shopping.ShoppingList;
 import com.shop.food.entity.shopping.Task;
@@ -10,8 +9,8 @@ import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.ResourceNotFoundException;
 import com.shop.food.exception.UserNotFoundException;
-import com.shop.food.reposistory.ShoppingListRepository;
-import com.shop.food.reposistory.TaskRepository;
+import com.shop.food.repository.ShoppingListRepository;
+import com.shop.food.repository.TaskRepository;
 import com.shop.food.service.iservice.FoodService;
 import com.shop.food.service.iservice.GroupService;
 import com.shop.food.service.iservice.ShoppingListTaskService;
@@ -83,6 +82,11 @@ public class ShoppingListTaskServiceImpl implements ShoppingListTaskService {
     @Override
     public List<ShoppingList> getShoppingListByUserId(Integer userId) {
         return shoppingListRepository.getShoppingListAssignedToUser(userId);
+    }
+
+    @Override
+    public ShoppingList getShoppingList(Integer listId) throws ResourceNotFoundException {
+        return shoppingListRepository.findById(listId).orElseThrow(() -> new ResourceNotFoundException("Shopping List not found"));
     }
 
     @Override

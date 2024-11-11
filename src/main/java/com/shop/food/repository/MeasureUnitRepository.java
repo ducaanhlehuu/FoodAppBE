@@ -1,4 +1,4 @@
-package com.shop.food.reposistory;
+package com.shop.food.repository;
 
 import com.shop.food.entity.food.MeasureUnit;
 import org.springframework.data.jpa.repository.JpaRepository;

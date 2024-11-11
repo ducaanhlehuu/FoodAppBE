@@ -4,7 +4,7 @@ import com.shop.food.dto.FoodDto;
 import com.shop.food.entity.food.Food;
 import com.shop.food.entity.food.FoodCategory;
 import com.shop.food.entity.food.MeasureUnit;
-import com.shop.food.reposistory.*;
+import com.shop.food.repository.*;
 import com.shop.food.service.iservice.FoodService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
