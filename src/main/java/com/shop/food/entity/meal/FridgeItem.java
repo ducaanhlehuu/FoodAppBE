@@ -14,6 +14,8 @@ import org.hibernate.annotations.Immutable;
 
 import java.util.Date;
 
+import java.util.Date;
+
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table
