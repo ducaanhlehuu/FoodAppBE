@@ -39,4 +39,14 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ResponseBody> handleUserNotFoundException(IllegalArgumentException ex) {
+        ResponseBody responseBody = new ResponseBody();
+        responseBody.setResultMessage(ex.getMessage());
+        responseBody.setResultCode("401");
+        responseBody.setData(null);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+    }
+
 }

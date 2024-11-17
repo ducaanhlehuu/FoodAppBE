@@ -7,6 +7,7 @@ import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @EqualsAndHashCode(callSuper = false)
 @Entity
@@ -14,7 +15,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Food extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String name;

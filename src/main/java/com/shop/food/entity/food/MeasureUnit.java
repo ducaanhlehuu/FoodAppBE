@@ -15,7 +15,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class MeasureUnit extends BaseEntity {
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String unitName;
     private String toGram;
     private String description;
