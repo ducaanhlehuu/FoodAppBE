@@ -14,4 +14,5 @@ public interface MealPlanService {
     void deleteMealPlan(Integer id);
 
     List<MealPlan> getMealPlansByDate(String formattedDate, Integer groupId);
+    List<MealPlan> getMealPlansByGroup(Integer groupId);
 }

@@ -29,16 +29,16 @@ public class FoodCategoryController {
     @GetMapping
     public ResponseEntity<ResponseBody> getAllCategories() {
         List<FoodCategory> categories = foodCategoryService.getAll();
-        return ResponseEntity.ok(new ResponseBody("Lấy danh sách thành công", "", categories));
+        return ResponseEntity.ok(new ResponseBody("Lấy danh sách thành công", ResponseBody.SUCCESS, categories));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseBody> getCategoryById(@PathVariable Integer id) {
         FoodCategory category = foodCategoryService.getById(id);
         if (category != null) {
-            return ResponseEntity.ok(new ResponseBody("Lấy danh mục thành công", "", category));
+            return ResponseEntity.ok(new ResponseBody("Lấy danh mục thành công", ResponseBody.SUCCESS, category));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseBody("Không tìm thấy danh mục", "", null));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseBody("Không tìm thấy danh mục", ResponseBody.NOT_FOUND, null));
     }
 
     @PostMapping
@@ -46,21 +46,21 @@ public class FoodCategoryController {
     public ResponseEntity<ResponseBody> createCategory(@Param("name") String name, @Param("alias") String alias, @Param("description") @Nullable String description) throws UnauthorizedException {
         FoodCategory category = FoodCategory.builder().name(name).alias(alias).description(description).build();
         foodCategoryService.create(category);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ResponseBody("Tạo danh mục thành công", "", category));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseBody("Tạo danh mục thành công", ResponseBody.SUCCESS, category));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseBody> updateCategory(@PathVariable Integer id, @RequestBody FoodCategory category) throws UnauthorizedException {
         FoodCategory updatedCategory = foodCategoryService.save(id, category);
-        return ResponseEntity.ok(new ResponseBody("Cập nhật danh mục thành công", "", updatedCategory));
+        return ResponseEntity.ok(new ResponseBody("Cập nhật danh mục thành công", ResponseBody.SUCCESS, updatedCategory));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseBody> deleteCategory(@PathVariable Integer id) throws UnauthorizedException {
         foodCategoryService.delete(id);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok(new ResponseBody("Xóa danh mục thành công", ResponseBody.DELETED, ""));
     }
 
 }

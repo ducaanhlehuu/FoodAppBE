@@ -2,11 +2,14 @@ package com.shop.food.security.auth;
 
 import com.shop.food.entity.user.Role;
 import com.shop.food.entity.user.User;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.repository.UserRepository;
 import com.shop.food.security.JWTService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +36,22 @@ public class AuthenticationService {
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(),request.getPassword()));
-        var user = reposistory.findByEmail(request.getEmail()).orElseThrow();
-        var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+    public AuthenticationResponse authenticate(AuthenticationRequest request) throws UnauthorizedException {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+            );
+
+            var user = reposistory.findByEmail(request.getEmail())
+                    .orElseThrow(() -> new UnauthorizedException("User not found."));
+            var jwtToken = jwtService.generateToken(user);
+            return AuthenticationResponse.builder().token(jwtToken).build();
+
+        } catch (BadCredentialsException ex) {
+            throw new UnauthorizedException("Invalid email or password.");
+        } catch (Exception ex) {
+            throw new UnauthorizedException("Authentication failed.");
+        }
     }
 
 

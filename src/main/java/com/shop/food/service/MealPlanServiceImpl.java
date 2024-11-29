@@ -117,4 +117,9 @@ public class MealPlanServiceImpl implements MealPlanService {
     public List<MealPlan> getMealPlansByDate(String formattedDate, Integer groupId) {
         return mealPlanRepository.findByDate(formattedDate, groupId);
     }
+
+    @Override
+    public List<MealPlan> getMealPlansByGroup(Integer groupId) {
+        return mealPlanRepository.findByGroup(groupId);
+    }
 }

@@ -1,28 +1,19 @@
 package com.shop.food.controller;
 
-import com.shop.food.dto.GroupDto;
 import com.shop.food.entity.response.ResponseBody;
-import com.shop.food.entity.response.ResultMessage;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.Role;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.exception.UserNotFoundException;
-import com.shop.food.security.JWTService;
 import com.shop.food.service.iservice.GroupService;
 import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -44,9 +35,9 @@ public class GroupController {
         String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group group = groupService.getGroup(groupId);
         if (group == null) {
-            return new ResponseEntity<>(new ResponseBody("Not found group", "", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseBody("Not found group", ResponseBody.NOT_FOUND, null), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new ResponseBody("Get success", "", group), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Get success", ResponseBody.SUCCESS, group), HttpStatus.OK);
     }
 
     @GetMapping("/all")
@@ -56,7 +47,7 @@ public class GroupController {
                 groupService.getAllGroup() :
                 groupService.getAllGroupByUserEmail(userEmail);
 
-        return new ResponseEntity<>(ResponseBody.builder().data(groups).resultCode("1").resultMessage("Lấy thành công").build(), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseBody.builder().data(groups).resultCode(ResponseBody.SUCCESS).resultMessage("Lấy thành công").build(), HttpStatus.OK);
     }
 
     @PostMapping("/create")
@@ -67,9 +58,9 @@ public class GroupController {
         group.setDescription(description);
         try {
             groupService.addGroup(group, username);
-            return new ResponseEntity<>(new ResponseBody("Success", "2", group), HttpStatus.CREATED);
+            return new ResponseEntity<>(new ResponseBody("Success", ResponseBody.SUCCESS, group), HttpStatus.OK);
         } catch (UserNotFoundException exception) {
-            return new ResponseEntity<>(new ResponseBody("User not found", "2", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBody("User not found", ResponseBody.NOT_FOUND, null), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -78,12 +69,12 @@ public class GroupController {
         String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group existedGroup = groupService.getGroup(group.getId());
         if (existedGroup == null) {
-            return new ResponseEntity<>(new ResponseBody("Not found group", "", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseBody("Not found group", ResponseBody.NOT_FOUND, null), HttpStatus.NOT_FOUND);
         }
         checkGroupOwner(userEmail, existedGroup);
         existedGroup.updateGroup(group);
         groupService.saveGroup(existedGroup);
-        return new ResponseEntity<>(new ResponseBody("Update group successfully", "", existedGroup), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Update group successfully", ResponseBody.SUCCESS, existedGroup), HttpStatus.OK);
     }
 
     @DeleteMapping("/{groupId}")
@@ -92,18 +83,18 @@ public class GroupController {
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);
         if (!groupService.deleteGroup(groupId)) {
-            return new ResponseEntity<>(new ResponseBody("Not found group", "", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseBody("Not found group", ResponseBody.NOT_FOUND, null), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new ResponseBody("Delete group successfully", "", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Delete group successfully", ResponseBody.DELETED, null), HttpStatus.OK);
     }
 
     @GetMapping("/{groupId}/members")
     public ResponseEntity<ResponseBody> getGroupMembers(@PathVariable Integer groupId) {
         if (groupService.getGroup(groupId) == null) {
-            return new ResponseEntity<>(new ResponseBody("Not found group", "", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseBody("Not found group", ResponseBody.NOT_FOUND, null), HttpStatus.NOT_FOUND);
         }
         List<User> members = groupService.getGroupMembers(groupId);
-        return new ResponseEntity<>(new ResponseBody("Get member success", "", members), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Get member success", ResponseBody.SUCCESS, members), HttpStatus.OK);
     }
 
     @PostMapping("/{groupId}/members/{userId}")
@@ -112,7 +103,7 @@ public class GroupController {
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);
         Group group = groupService.addMemberToGroup(groupId, userId);
-        return new ResponseEntity<>(new ResponseBody("Add new member successfully", "", group), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Add new member successfully", ResponseBody.SUCCESS, group), HttpStatus.OK);
     }
 
     @DeleteMapping("/{groupId}/members/{userId}")
@@ -121,7 +112,7 @@ public class GroupController {
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);
         Group group = groupService.removeMemberInGroup(groupId, userId);
-        return new ResponseEntity<>(new ResponseBody("Remove member successfully", "", group), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Remove member successfully", ResponseBody.DELETED, group), HttpStatus.OK);
     }
     
 }

@@ -40,19 +40,19 @@ public class FoodController {
         String email = ServerUtil.getAuthenticatedUserEmail();
         User user = userService.getUserByEmail(email);
         if(user == null) {
-            return new ResponseEntity<>(new ResponseBody("User not found", "Fail", null), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseBody("User not found", ResponseBody.NOT_FOUND, null), HttpStatus.BAD_REQUEST);
         }
         foodDto.setOwnerId(user.getId());
         String imageUrl = null;
         if (foodDto.getImage() != null && !foodDto.getImage().isEmpty()) {
             imageUrl = s3Service.uploadFile(foodDto.getImage(), "food/" , foodDto.getGroupId() +"/" +  foodDto.getName().toLowerCase() + new Date().getTime());
             if (imageUrl == null) {
-                return new ResponseEntity<>(new ResponseBody("Upload image exception", "", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new ResponseBody("Upload image exception", ResponseBody.SERVER_ERROR, ""), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
         Food createdFood = foodService.createFood(foodDto, imageUrl );
-        return new ResponseEntity<>(new ResponseBody("Food created successfully", "", createdFood), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ResponseBody("Food created successfully", ResponseBody.SUCCESS, createdFood), HttpStatus.CREATED);
     }
 
     @PutMapping("/update/{foodId}")
@@ -61,17 +61,17 @@ public class FoodController {
         if (foodDto.getImage() != null && !foodDto.getImage().isEmpty()) {
             imageUrl = s3Service.uploadFile(foodDto.getImage(), "food/" , foodDto.getGroupId() +"/" +  foodDto.getName().toLowerCase() + new Date().getTime());
             if (imageUrl == null) {
-                return new ResponseEntity<>(new ResponseBody("Upload image exception", "", ""), HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<>(new ResponseBody("Upload image exception", ResponseBody.SERVER_ERROR, ""), HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
         Food updatedFood = foodService.updateFood(foodDto, foodId, imageUrl);
-        return new ResponseEntity<>(new ResponseBody("Food updated successfully", "", updatedFood), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Food updated successfully", ResponseBody.SUCCESS, updatedFood), HttpStatus.OK);
     }
 
     @DeleteMapping("/delete/{foodId}")
     public ResponseEntity<ResponseBody> deleteFood(@PathVariable Integer foodId) {
         foodService.deleteFood(foodId);
-        return new ResponseEntity<>(new ResponseBody("Food deleted successfully", "Success", null), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Food deleted successfully", ResponseBody.SUCCESS, null), HttpStatus.OK);
     }
 
     @GetMapping("/group/{groupId}")
@@ -80,16 +80,16 @@ public class FoodController {
             throw new UnauthorizedException("Not in this group");
         }
         List<Food> foods = foodService.getAllFoodsInGroup(groupId);
-        return new ResponseEntity<>(new ResponseBody("Retrieved all foods in group", "Success", foods), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Retrieved all foods in group", ResponseBody.SUCCESS, foods), HttpStatus.OK);
     }
 
     @GetMapping("/{foodId}")
     public ResponseEntity<ResponseBody> getFoodById(@PathVariable Integer foodId) {
         Food food = foodService.getFoodById(foodId);
         if (food == null) {
-            return new ResponseEntity<>(new ResponseBody("Food not found", "Error", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseBody("Food not found", ResponseBody.NOT_FOUND, null), HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>(new ResponseBody("Retrieved food", "Success", food), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseBody("Retrieved food", ResponseBody.SUCCESS, food), HttpStatus.OK);
     }
 
 

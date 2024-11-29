@@ -14,5 +14,8 @@ public interface MealPlanRepository extends JpaRepository<MealPlan, Integer> {
 
     @Query("SELECT m FROM MealPlan m WHERE FUNCTION('DATE_FORMAT', m.timeStamp, '%Y-%m-%d') = :date AND m.group.id = :groupId")
     List<MealPlan> findByDate(@Param("date") String date, @Param("groupId") Integer groupId);
+
+    @Query("SELECT m FROM MealPlan m WHERE  m.group.id = :groupId")
+    List<MealPlan> findByGroup(@Param("groupId") Integer groupId);
 }
 

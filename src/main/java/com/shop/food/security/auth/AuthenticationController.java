@@ -1,6 +1,7 @@
 package com.shop.food.security.auth;
 
 import com.shop.food.entity.response.ResponseBody;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.service.external.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.repository.query.Param;
@@ -43,7 +44,7 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping("/login")
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest request) throws UnauthorizedException {
         return ResponseEntity.ok(service.authenticate(request));
     }
 

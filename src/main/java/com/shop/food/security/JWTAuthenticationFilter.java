@@ -31,23 +31,50 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwtToken;
         final String userEmail;
+        String path = request.getServletPath();
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request , response);
+        if (path.startsWith("/api/user/auth") || path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui")) {
+            filterChain.doFilter(request, response);
             return;
         }
-        jwtToken = authHeader.substring(7);
-        userEmail = jwtService.extractUserName(jwtToken);
 
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtService.isValidToken(jwtToken , userDetails)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
-                authToken.setDetails( new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
-            System.out.println(userDetails.getAuthorities().toString());
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            handleException(response, HttpServletResponse.SC_UNAUTHORIZED,
+                    "Authorization header is missing or invalid.", "No or invalid token provided.");
+            return;
         }
-        filterChain.doFilter(request, response);
+
+        jwtToken = authHeader.substring(7);
+        try {
+            userEmail = jwtService.extractUserName(jwtToken); // Lấy thông tin từ JWT
+
+            if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+
+                if (jwtService.isValidToken(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+
+            filterChain.doFilter(request, response);
+        } catch (io.jsonwebtoken.ExpiredJwtException ex) {
+            handleException(response, HttpServletResponse.SC_UNAUTHORIZED, "JWT token has expired. Please login again.", ex.getMessage());
+        } catch (Exception ex) {
+            handleException(response, HttpServletResponse.SC_FORBIDDEN, "Authentication failed.", ex.getMessage());
+        }
     }
+
+    private void handleException(HttpServletResponse response, int status, String message, String details) throws IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        response.getWriter().write(String.format(
+                "{ \"timestamp\": \"%s\", \"status\": %d, \"error\": \"%s\", \"details\": \"%s\" }",
+                java.time.LocalDateTime.now(), status, message, details
+        ));
+        response.getWriter().flush();
+    }
+
 }

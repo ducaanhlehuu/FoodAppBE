@@ -35,4 +35,6 @@ build/
 .vscode/
 /src/main/resources/ca.pem
 /src/main/resources/application.yml
+src/main/resources/application.yml
+
 

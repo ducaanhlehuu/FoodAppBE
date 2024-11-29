@@ -23,13 +23,13 @@ public class MeasureUnitController {
     @GetMapping
     public ResponseEntity<ResponseBody> getAllMeasureUnits() {
         List<MeasureUnit> measureUnits = measureUnitService.getAllFoodCategories();
-        return ResponseEntity.ok(new ResponseBody("Lấy danh sách đơn vị đo thành công", "", measureUnits));
+        return ResponseEntity.ok(new ResponseBody("Lấy danh sách đơn vị đo thành công", ResponseBody.SUCCESS, measureUnits));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ResponseBody> getMeasureUnitById(@PathVariable Integer id) {
         MeasureUnit measureUnit = measureUnitService.getMeasureUnitById(id);
-        return ResponseEntity.ok(new ResponseBody("Lấy đơn vị đo thành công", "", measureUnit));
+        return ResponseEntity.ok(new ResponseBody("Lấy đơn vị đo thành công", ResponseBody.SUCCESS, measureUnit));
     }
 
     @PostMapping
@@ -38,20 +38,20 @@ public class MeasureUnitController {
         MeasureUnit createdMeasureUnit = MeasureUnit.builder().unitName(unitName).toGram(toGram).description(description).build();
         measureUnitService.createMeasureUnit(createdMeasureUnit);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new ResponseBody("Tạo đơn vị đo thành công", "", createdMeasureUnit));
+                .body(new ResponseBody("Tạo đơn vị đo thành công", ResponseBody.SUCCESS, createdMeasureUnit));
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseBody> updateMeasureUnit(@PathVariable Integer id, @RequestBody MeasureUnit measureUnit) throws UnauthorizedException {
         MeasureUnit updatedMeasureUnit = measureUnitService.save(id, measureUnit);
-        return ResponseEntity.ok(new ResponseBody("Cập nhật đơn vị đo thành công", "", updatedMeasureUnit));
+        return ResponseEntity.ok(new ResponseBody("Cập nhật đơn vị đo thành công", ResponseBody.SUCCESS, updatedMeasureUnit));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ResponseBody> deleteMeasureUnit(@PathVariable Integer id) throws UnauthorizedException {
         measureUnitService.deleteMeasureUnit(id);
-        return ResponseEntity.ok(new ResponseBody("Xóa thành công", "", null));
+        return ResponseEntity.ok(new ResponseBody("Xóa thành công", ResponseBody.DELETED, null));
     }
 }
