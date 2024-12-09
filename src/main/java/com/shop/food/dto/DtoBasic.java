@@ -1,4 +1,4 @@
-package com.shop.food.entity.food;
+package com.shop.food.dto;
 
 import lombok.Data;
 

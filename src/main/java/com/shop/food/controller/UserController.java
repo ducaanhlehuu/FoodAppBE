@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.shop.food.util.ServerUtil.getAuthenticatedUserEmail;
 
@@ -98,9 +100,10 @@ public class UserController {
         return contentType != null && contentType.startsWith("image/");
     }
 
-    @GetMapping("/extract/profile")
-    public ResponseEntity<ResponseBody> getUser(@PathVariable("userId") Integer userId) throws UnauthorizedException {
+    @GetMapping("/profile")
+    public ResponseEntity<ResponseBody> getUser() throws UnauthorizedException {
         String email =  ServerUtil.getAuthenticatedUserEmail();
+        Map<String, Object> userInfo = new HashMap<>();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new ResponseBody("Get profile successfully", ResponseBody.SUCCESS, userService.getUserByEmail(email)));
     }

@@ -11,6 +11,5 @@ public class FridgeItemDto {
     private Integer useWithin;
     private String note;
     private Integer foodId;
-    private Integer groupId;
     private Integer ownerId;
 }

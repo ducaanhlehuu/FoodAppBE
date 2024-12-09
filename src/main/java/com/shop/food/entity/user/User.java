@@ -2,6 +2,7 @@ package com.shop.food.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shop.food.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -91,5 +93,13 @@ public class User extends BaseEntity implements UserDetails {
 
     public User(Integer id) {
         this.setId(id);
+    }
+
+    @JsonProperty("groupIds")
+    public List<Integer> getGroupIds() {
+        if (groups == null || groups.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return groups.stream().map(item -> item.getId()).toList();
     }
 }

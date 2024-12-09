@@ -9,5 +9,4 @@ public class MealPlanDto {
     private String timeStamp;
     private Integer foodId;
     private Integer ownerId;
-    private Integer group;
 }

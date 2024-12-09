@@ -34,18 +34,15 @@ public class FridgeItem extends BaseEntity {
     private Food food;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
-    @JsonIgnore
-    @Immutable
-    private Group group;
-
-    @ManyToOne
     @JoinColumn(name = "owner_id")
     @Immutable
     private User owner;
 
     @JsonProperty("group_id")
     public Integer getGroupId() {
-        return group != null ? group.getId() : null;
+        if (food!=null && food.getGroup()!=null) {
+            return food.getGroup().getId();
+        }
+        return null;
     }
 }

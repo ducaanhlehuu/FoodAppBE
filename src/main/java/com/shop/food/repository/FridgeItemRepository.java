@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface FridgeItemRepository extends JpaRepository<FridgeItem, Integer> {
-    @Query("SELECT f FROM FridgeItem f WHERE f.group.id = :groupId")
+    @Query("SELECT f FROM FridgeItem f WHERE f.food.group.id = :groupId")
     List<FridgeItem> findByGroupId(@Param("groupId") Integer groupId);
     List<FridgeItem> findByOwnerId(Integer ownerId);
     List<FridgeItem> findByFoodId(Integer foodId);

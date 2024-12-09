@@ -1,6 +1,6 @@
 package com.shop.food.entity.meal;
 
 public enum STATUS {
-    HAVE_PASS,
+    PASSED,
     NOT_PASS_YET
 }

@@ -46,20 +46,17 @@ public class MealPlan extends BaseEntity {
     @Immutable
     private User owner;
 
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    @JsonIgnore
-    @Immutable
-    private Group group;
-
-
     @JsonProperty("owner_id")
     public Integer getOwnerId() {
         return owner != null ? owner.getId() : null;
     }
+    
     @JsonProperty("group_id")
     public Integer getGroupId() {
-        return group != null ? group.getId() : null;
+        if (food!=null && food.getGroup()!=null) {
+            return food.getGroup().getId();
+        }
+        return null;
     }
 
 //    public Map<Integer, String> getStatusNameMap() {

@@ -78,18 +78,8 @@ public class FridgeItemServiceImpl implements FridgeItemService {
                 throw new ResourceNotFoundException("Food not found with ID: " + fridgeItemDto.getFoodId());
             }
         }
-
-        if (fridgeItemDto.getGroupId() != null) {
-            if (groupRepository.existsById(fridgeItemDto.getGroupId())) {
-                fridgeItem.setGroup(Group.builder().id(fridgeItemDto.getGroupId()).build());
-            }
-            else {
-               throw new ResourceNotFoundException("Group not found with ID: " + fridgeItemDto.getGroupId());
-            }
-        }
         if (fridgeItemDto.getOwnerId() != null) {
             if (userRepository.existsById(fridgeItemDto.getOwnerId())) {
-                fridgeItem.setGroup(Group.builder().id(fridgeItemDto.getGroupId()).build());
                 fridgeItem.setOwner(User.builder().id(fridgeItemDto.getOwnerId()).build());
             }
             else {

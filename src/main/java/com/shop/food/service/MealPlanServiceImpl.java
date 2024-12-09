@@ -58,13 +58,6 @@ public class MealPlanServiceImpl implements MealPlanService {
             throw new RuntimeException("Owner not found with id: " + mealPlanDto.getOwnerId());
         }
 
-        if (groupRepository.existsById(mealPlanDto.getGroup())) {
-            Group group = Group.builder().id(mealPlanDto.getGroup()).build();
-            mealPlan.setGroup(group);
-        } else {
-            throw new RuntimeException("Group not found with id: " + mealPlanDto.getGroup());
-        }
-
         return mealPlanRepository.save(mealPlan);
     }
 
@@ -82,8 +75,6 @@ public class MealPlanServiceImpl implements MealPlanService {
             throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd");
         }
 
-        existingMealPlan.setStatus(STATUS.NOT_PASS_YET);
-
         if (foodRepository.existsById(mealPlanDto.getFoodId())) {
             Food food = foodRepository.findById(mealPlanDto.getFoodId()).orElse(null);
             existingMealPlan.setFood(food);
@@ -98,13 +89,6 @@ public class MealPlanServiceImpl implements MealPlanService {
             throw new RuntimeException("Owner not found with id: " + mealPlanDto.getOwnerId());
         }
 
-        if (groupRepository.existsById(mealPlanDto.getGroup())) {
-            Group group = Group.builder().id(mealPlanDto.getGroup()).build();
-            existingMealPlan.setGroup(group);
-        } else {
-            throw new RuntimeException("Group not found with id: " + mealPlanDto.getGroup());
-        }
-
         return mealPlanRepository.save(existingMealPlan);
     }
 
@@ -115,11 +99,30 @@ public class MealPlanServiceImpl implements MealPlanService {
 
     @Override
     public List<MealPlan> getMealPlansByDate(String formattedDate, Integer groupId) {
-        return mealPlanRepository.findByDate(formattedDate, groupId);
+        List<MealPlan> mealPlans = mealPlanRepository.findByDate(formattedDate, groupId);
+        for (MealPlan mealPlan: mealPlans) {
+            long now = System.currentTimeMillis();
+            if (mealPlan.getTimeStamp().getTime() < now) {
+                mealPlan.setStatus(STATUS.PASSED);
+            }
+            else {
+                mealPlan.setStatus(STATUS.NOT_PASS_YET);
+            }
+        }
+        return mealPlanRepository.saveAll(mealPlans);
     }
 
     @Override
     public List<MealPlan> getMealPlansByGroup(Integer groupId) {
-        return mealPlanRepository.findByGroup(groupId);
+        List<MealPlan> mealPlans = mealPlanRepository.findByGroup(groupId);
+        for (MealPlan mealPlan: mealPlans) {
+            long now = System.currentTimeMillis();
+            if (mealPlan.getTimeStamp().getTime() < now) {
+                mealPlan.setStatus(STATUS.PASSED);
+            } else {
+                mealPlan.setStatus(STATUS.NOT_PASS_YET);
+            }
+        }
+        return mealPlanRepository.saveAll(mealPlans);
     }
 }

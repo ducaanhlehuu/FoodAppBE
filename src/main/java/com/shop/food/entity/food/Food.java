@@ -2,6 +2,7 @@ package com.shop.food.entity.food;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shop.food.entity.BaseEntity;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
@@ -42,4 +43,9 @@ public class Food extends BaseEntity {
     @JoinColumn(name="group_id")
     @JsonIgnore
     private Group group;
+
+    @JsonProperty("groupId")
+    public Integer getGroupId(){
+        return group!=null? group.getId() : null;
+    }
 }
