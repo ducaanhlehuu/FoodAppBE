@@ -12,4 +12,5 @@ public interface UserService {
     public User getUserByEmail(String email);
     public User saveUser(User User);
     public void changePassWord(Integer userId, String oldPassword, String newPassWord) throws UserNotFoundException, PasswordNotMatchException;
+    public User saveNotificationToken(String email, String token) throws UserNotFoundException;
 }

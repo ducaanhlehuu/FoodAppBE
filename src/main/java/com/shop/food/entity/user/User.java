@@ -40,6 +40,7 @@ public class User extends BaseEntity implements UserDetails {
     private String deviceId;
     @Column(length = 256)
     private String photoUrl;
+    private String notificationToken;
     @Column(length = 108)
     @JsonIgnore
     private String verificationCode;

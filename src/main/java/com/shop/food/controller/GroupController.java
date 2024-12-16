@@ -1,5 +1,6 @@
 package com.shop.food.controller;
 
+import com.shop.food.dto.GroupDto;
 import com.shop.food.entity.response.ResponseBody;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.Role;
@@ -64,15 +65,15 @@ public class GroupController {
         }
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseBody> updateGroup(@RequestBody Group group) throws UnauthorizedException {
+    @PutMapping
+    public ResponseEntity<ResponseBody> updateGroup(@RequestBody GroupDto groupDto) throws UnauthorizedException {
         String userEmail = ServerUtil.getAuthenticatedUserEmail();
-        Group existedGroup = groupService.getGroup(group.getId());
+        Group existedGroup = groupService.getGroup(groupDto.getId());
         if (existedGroup == null) {
             return new ResponseEntity<>(new ResponseBody("Not found group", ResponseBody.NOT_FOUND, null), HttpStatus.NOT_FOUND);
         }
         checkGroupOwner(userEmail, existedGroup);
-        existedGroup.updateGroup(group);
+        existedGroup.updateGroup(groupDto);
         groupService.saveGroup(existedGroup);
         return new ResponseEntity<>(new ResponseBody("Update group successfully", ResponseBody.SUCCESS, existedGroup), HttpStatus.OK);
     }

@@ -1,15 +1,18 @@
 package com.shop.food.controller;
 
 import com.shop.food.dto.ChangePasswordRequest;
+import com.shop.food.dto.NotificationMessage;
 import com.shop.food.dto.UserProfileUpdateRequest;
 import com.shop.food.entity.response.ResponseBody;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.PasswordNotMatchException;
 import com.shop.food.exception.UnauthorizedException;
+import com.shop.food.service.external.FirebaseMessagingService;
 import com.shop.food.service.external.S3Service;
 import com.shop.food.service.iservice.UserService;
 import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +30,7 @@ import static com.shop.food.util.ServerUtil.getAuthenticatedUserEmail;
 public class UserController {
     private final UserService userService;
     private final S3Service s3Service;
+    private final FirebaseMessagingService firebaseMessagingService;
 
     @PutMapping("/edit/profile")
     public ResponseEntity<ResponseBody> editProfile(@RequestBody UserProfileUpdateRequest updateRequest) {
@@ -108,4 +112,16 @@ public class UserController {
                 .body(new ResponseBody("Get profile successfully", ResponseBody.SUCCESS, userService.getUserByEmail(email)));
     }
 
+    @PostMapping("/send-notification")
+    public ResponseEntity<ResponseBody> sendNotification(@RequestBody NotificationMessage notificationMessage) throws Exception {
+        return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS)
+                .resultMessage(firebaseMessagingService.sendNotification(notificationMessage)).build());
+    }
+
+    @PostMapping("/save-notification-token")
+    public ResponseEntity<ResponseBody> saveNotificationToken(@RequestParam String token) throws Exception {
+        String email =  ServerUtil.getAuthenticatedUserEmail();
+        return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS).resultMessage("Lưu thành công Token: " + token)
+                .data(userService.saveNotificationToken(email,token)).build());
+    }
 }

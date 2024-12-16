@@ -7,9 +7,9 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Builder
-public class GroupDto extends DtoBasic {
+public class GroupDto {
     private Integer id;
-    private String groupName;
+    private String name;
     private String description;
-    private boolean enable;
+    private Boolean enable;
 }

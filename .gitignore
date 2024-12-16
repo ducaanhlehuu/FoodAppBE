@@ -38,3 +38,5 @@ build/
 src/main/resources/application.yml
 
 
+/src/main/resources/google-services.json
+/src/main/resources/food-app-7b572-firebase-adminsdk-hfe1d-1f06aaf4b5.json

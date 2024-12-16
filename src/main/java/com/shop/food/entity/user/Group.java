@@ -37,10 +37,10 @@ public class Group extends BaseEntity {
     )
     private List<User> members;
 
-    public void updateGroup(Group group) {
-        this.name = group.getName();
-        this.description = group.getDescription();
-        this.enable = group.isEnable();
+    public void updateGroup(GroupDto groupDto) {
+        this.name = groupDto.getName();
+        this.description = groupDto.getDescription();
+        this.enable = groupDto.getEnable() != null ? groupDto.getEnable() : this.enable;
     }
     @JsonProperty("owner_id")
     public Integer getOwnerId() {

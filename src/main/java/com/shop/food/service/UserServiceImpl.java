@@ -52,4 +52,14 @@ public class UserServiceImpl implements UserService {
         }
         existedUser.setPassword(encoder.encode(newPassWord));
     }
+
+    @Override
+    public User saveNotificationToken(String email, String token) throws UserNotFoundException {
+        User existedUser = userReposistory.findByEmail(email).orElse(null);
+        if (existedUser==null) {
+            throw new UserNotFoundException("User not found");
+        }
+        existedUser.setNotificationToken(token);
+        return userReposistory.save(existedUser);
+    }
 }
