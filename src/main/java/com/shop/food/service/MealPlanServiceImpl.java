@@ -29,17 +29,18 @@ public class MealPlanServiceImpl implements MealPlanService {
     private final FoodRepository foodRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
-    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     @Override
     public MealPlan createMealPlan(MealPlanDto mealPlanDto) {
         MealPlan mealPlan = new MealPlan();
         mealPlan.setName(mealPlanDto.getName());
         try {
+            // Parse ngày và giờ
             Date parsedDate = dateFormatter.parse(mealPlanDto.getTimeStamp());
             mealPlan.setTimeStamp(parsedDate);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd");
+            throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd'T'HH:mm. Ex: 2024-12-01T12:20");
         }
 
         mealPlan.setStatus(STATUS.NOT_PASS_YET);
@@ -72,7 +73,7 @@ public class MealPlanServiceImpl implements MealPlanService {
             Date parsedDate = dateFormatter.parse(mealPlanDto.getTimeStamp());
             existingMealPlan.setTimeStamp(parsedDate);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd");
+            throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd'T'HH:mm. Ex: 2024-12-01T12:20");
         }
 
         if (foodRepository.existsById(mealPlanDto.getFoodId())) {

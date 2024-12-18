@@ -5,11 +5,15 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shop.food.dto.GroupDto;
 import com.shop.food.entity.BaseEntity;
+import com.shop.food.entity.meal.Recipe;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
@@ -37,6 +41,12 @@ public class Group extends BaseEntity {
     )
     private List<User> members;
 
+    @ManyToMany(mappedBy = "groups",fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Recipe> recipes = new ArrayList<>();
+    @Transient
+    private List<GroupRecipe> groupRecipes;
+
     public void updateGroup(GroupDto groupDto) {
         this.name = groupDto.getName();
         this.description = groupDto.getDescription();
@@ -46,4 +56,5 @@ public class Group extends BaseEntity {
     public Integer getOwnerId() {
         return owner != null ? owner.getId() : null;
     }
+
 }

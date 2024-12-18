@@ -5,6 +5,7 @@ import com.shop.food.entity.user.User;
 import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.service.iservice.GroupService;
+import com.shop.food.service.iservice.UserService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
@@ -22,6 +23,10 @@ public class ServerUtil {
 
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private GroupService groupService;
+    @Autowired
+    private UserService userService;
 
     public static String getAuthenticatedUserEmail() throws UnauthorizedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -41,5 +46,19 @@ public class ServerUtil {
         } catch (NoResultException e) {
             throw new UserNotFoundException("User not found with email: " + email);
         }
+    }
+
+    public boolean checkUserInGroup(Integer groupId) throws UnauthorizedException {
+        String email = ServerUtil.getAuthenticatedUserEmail();
+        Group group = groupService.getGroup(groupId);
+        if (group == null) {
+            return false;
+        }
+        return  group.getMembers().stream().map(User::getEmail).toList().contains(email);
+    }
+
+    public User getCurrentUser() throws UnauthorizedException {
+        String email = ServerUtil.getAuthenticatedUserEmail();
+        return userService.getUserByEmail(email);
     }
 }

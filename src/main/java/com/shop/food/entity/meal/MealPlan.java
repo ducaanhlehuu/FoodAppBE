@@ -26,8 +26,8 @@ import java.util.Date;
 public class MealPlan extends BaseEntity {
 
     private String name;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Ho_Chi_Minh")
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Ho_Chi_Minh")
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date timeStamp;
 

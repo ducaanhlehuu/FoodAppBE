@@ -46,6 +46,6 @@ public class Food extends BaseEntity {
 
     @JsonProperty("groupId")
     public Integer getGroupId(){
-        return group!=null? group.getId() : null;
+        return group!=null? group.getId() : -1;
     }
 }

@@ -3,7 +3,9 @@ package com.shop.food.controller;
 import com.shop.food.dto.MealPlanDto;
 import com.shop.food.entity.meal.MealPlan;
 import com.shop.food.entity.response.ResponseBody;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.service.iservice.MealPlanService;
+import com.shop.food.util.ServerUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -23,6 +26,7 @@ import java.util.List;
 public class MealPlanController {
 
     private final MealPlanService mealPlanService;
+    private final ServerUtil serverUtil;
 
     @Operation(summary = "Create a new MealPlan",
             description = "Creates a new MealPlan with the provided details. The date must be in yyyy-MM-dd format.")
@@ -88,6 +92,19 @@ public class MealPlanController {
     public ResponseEntity<ResponseBody> getMealPlansByGroup(
             @PathVariable @Parameter(description = "Group ID to filter MealPlans") Integer groupId) {
         List<MealPlan> mealPlans = mealPlanService.getMealPlansByGroup(groupId);
+        ResponseBody responseBody = new ResponseBody("MealPlans retrieved successfully", ResponseBody.SUCCESS, mealPlans);
+        return ResponseEntity.ok(responseBody);
+    }
+
+    @GetMapping("/groups")
+    public ResponseEntity<ResponseBody> getMealPlansByGroup(
+            @RequestParam @Parameter(description = "Group IDs to filter MealPlans") List<Integer> groupIds)  throws UnauthorizedException{
+        List<MealPlan> mealPlans = new ArrayList<>();
+        for (Integer groupId : groupIds) {
+            if (serverUtil.checkUserInGroup(groupId)) {
+                mealPlans.addAll(mealPlanService.getMealPlansByGroup(groupId));
+            }
+        }
         ResponseBody responseBody = new ResponseBody("MealPlans retrieved successfully", ResponseBody.SUCCESS, mealPlans);
         return ResponseEntity.ok(responseBody);
     }

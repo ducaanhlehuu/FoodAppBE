@@ -7,6 +7,7 @@ import com.shop.food.entity.response.ResponseBody;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.PasswordNotMatchException;
 import com.shop.food.exception.UnauthorizedException;
+import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.service.external.FirebaseMessagingService;
 import com.shop.food.service.external.S3Service;
 import com.shop.food.service.iservice.UserService;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -123,5 +125,19 @@ public class UserController {
         String email =  ServerUtil.getAuthenticatedUserEmail();
         return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS).resultMessage("Lưu thành công Token: " + token)
                 .data(userService.saveNotificationToken(email,token)).build());
+    }
+
+    @GetMapping("/search-user")
+    public ResponseEntity<ResponseBody> searchUserByEmail(@RequestParam("email") String email) throws UserNotFoundException {
+       User user =  userService.getUserByEmail(email);
+       if (user == null) {
+           throw new UserNotFoundException("Not found user email: " + email);
+       }
+       Map<Object, Object> data = new HashMap<>();
+       data.put("id",user.getId());
+       data.put("email",user.getEmail());
+       data.put("fullName",user.getFullName());
+       data.put("photoUrl",user.getPhotoUrl());
+       return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS).resultMessage("Found user").data(data).build());
     }
 }

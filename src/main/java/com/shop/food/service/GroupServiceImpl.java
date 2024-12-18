@@ -3,6 +3,7 @@ package com.shop.food.service;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
+import com.shop.food.repository.GroupRecipeRepository;
 import com.shop.food.repository.GroupRepository;
 import com.shop.food.repository.UserRepository;
 import com.shop.food.service.iservice.GroupService;
@@ -17,6 +18,7 @@ import java.util.List;
 public class GroupServiceImpl implements GroupService {
 
     private final GroupRepository groupReposistory;
+    private final GroupRecipeRepository groupRecipeRepository;
     private final UserRepository userReposistory;
 
     @Override
@@ -31,7 +33,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public Group getGroup(Integer groupId) {
-        return groupReposistory.findById(groupId).orElse(null);
+        Group group = groupReposistory.findById(groupId).orElse(null);
+        if (group != null) {
+            group.setGroupRecipes(groupRecipeRepository.findByGroupId(groupId));
+        }
+        return group;
     }
 
     @Override

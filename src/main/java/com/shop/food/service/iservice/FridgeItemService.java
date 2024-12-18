@@ -18,4 +18,5 @@ public interface FridgeItemService {
     List<FridgeItem> getFridgeItemsByGroupId(Integer groupId);
 
     List<FridgeItem> getFridgeItemsByFoodId(Integer foodId);
+
 }

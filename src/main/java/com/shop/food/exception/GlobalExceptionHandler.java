@@ -13,6 +13,7 @@ import javax.security.sasl.AuthenticationException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,6 +39,16 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ResponseBody> handleUserNotFoundException(UserNotFoundException ex) {
+        ResponseBody responseBody = new ResponseBody();
+        responseBody.setResultMessage(ex.getMessage());
+        responseBody.setResultCode(ResponseBody.BAD_REQUEST);
+        responseBody.setData(null);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<ResponseBody> handleNoSuchElementException(NoSuchElementException ex) {
         ResponseBody responseBody = new ResponseBody();
         responseBody.setResultMessage(ex.getMessage());
         responseBody.setResultCode(ResponseBody.BAD_REQUEST);

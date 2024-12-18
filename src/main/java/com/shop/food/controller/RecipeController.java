@@ -4,7 +4,9 @@ import com.shop.food.dto.RecipeDto;
 import com.shop.food.entity.meal.Recipe;
 import com.shop.food.entity.response.ResponseBody;
 import com.shop.food.exception.ResourceNotFoundException;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.service.iservice.RecipeService;
+import com.shop.food.util.ServerUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,31 +29,22 @@ public class RecipeController {
 
     @Operation(summary = "Create a new Recipe",
             description = "Creates a new Recipe with the provided details.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Recipe created successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request")
-    })
     @PostMapping
     public ResponseEntity<ResponseBody> createRecipe(
-            @RequestBody @Parameter(description = "Details of the Recipe to be created") RecipeDto recipeDto) {
+            @RequestBody @Parameter(description = "Details of the Recipe to be created") RecipeDto recipeDto) throws UnauthorizedException, ResourceNotFoundException {
         try {
             Recipe recipe = recipeService.createRecipe(recipeDto);
             ResponseBody response = new ResponseBody("Recipe created successfully", ResponseBody.SUCCESS, recipe);
             return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (ResourceNotFoundException e) {
-            ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.BAD_REQUEST, null);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.SERVER_ERROR, null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
     @Operation(summary = "Update an existing Recipe",
             description = "Updates an existing Recipe by ID with the provided details.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recipe updated successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class))),
-            @ApiResponse(responseCode = "404", description = "Recipe not found")
-    })
     @PutMapping("/{id}")
     public ResponseEntity<ResponseBody> updateRecipe(
             @PathVariable @Parameter(description = "ID of the Recipe to update") Integer id,
@@ -68,10 +61,6 @@ public class RecipeController {
 
     @Operation(summary = "Delete a Recipe",
             description = "Deletes a Recipe by its ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Recipe deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Recipe not found")
-    })
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseBody> deleteRecipe(
             @PathVariable @Parameter(description = "ID of the Recipe to delete") Integer id) {
@@ -85,26 +74,25 @@ public class RecipeController {
         }
     }
 
-    @Operation(summary = "Retrieve all Recipes",
-            description = "Gets a list of all Recipes.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recipes retrieved successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class)))
-    })
-    @GetMapping
-    public ResponseEntity<ResponseBody> getAllRecipes() {
-        List<Recipe> recipes = recipeService.getAllRecipes();
+    @Operation(summary = "Retrieve Recipes by Group Id",
+            description = "Gets a list of ecipes.")
+    @GetMapping("group/{groupId}")
+    public ResponseEntity<ResponseBody> getAllRecipes(@PathVariable("groupId") Integer groupId) {
+        List<Recipe> recipes = recipeService.getRecipesInGroup(groupId);
+        ResponseBody response = new ResponseBody("Recipes retrieved successfully", ResponseBody.SUCCESS, recipes);
+        return ResponseEntity.ok(response);
+    }
+    @Operation(summary = "Retrieve Recipes of User",
+            description = "Gets a list of Recipes.")
+    @GetMapping("")
+    public ResponseEntity<ResponseBody> getMyRecipes() throws UnauthorizedException {
+        List<Recipe> recipes = recipeService.getRecipesByUser();
         ResponseBody response = new ResponseBody("Recipes retrieved successfully", ResponseBody.SUCCESS, recipes);
         return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Retrieve a Recipe by ID",
             description = "Gets the details of a Recipe by its ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Recipe retrieved successfully",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = Recipe.class))),
-            @ApiResponse(responseCode = "404", description = "Recipe not found")
-    })
     @GetMapping("/{id}")
     public ResponseEntity<ResponseBody> getRecipeById(
             @PathVariable @Parameter(description = "ID of the Recipe to retrieve") Integer id) {
@@ -115,6 +103,22 @@ public class RecipeController {
         } catch (ResourceNotFoundException e) {
             ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.NOT_FOUND, null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @Operation(summary = "Share a Recipe to other Group",
+            description = "Gets the details of a Recipe by its ID.")
+    @PostMapping("/share/{recipeId}/{groupId}")
+    public ResponseEntity<ResponseBody> shareRecipe(
+            @PathVariable("recipeId") @Parameter(description = "ID of the Recipe to retrieve") Integer recipeId,
+            @PathVariable("groupId") @Parameter(description = "ID of the Group") Integer groupId ) throws UnauthorizedException, ResourceNotFoundException {
+        try {
+            recipeService.shareRecipeToGroup(recipeId, groupId);
+            ResponseBody response = new ResponseBody("Recipe share successfully", ResponseBody.SUCCESS, "");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.SERVER_ERROR, null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 }
