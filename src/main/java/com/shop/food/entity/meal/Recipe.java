@@ -31,11 +31,10 @@ public class Recipe extends BaseEntity {
     private String htmlContent;
 
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "food_id")
     @Immutable
     private Food food;
-
 
     private List<Integer> rawMaterialIds = new ArrayList<>();
 
@@ -44,7 +43,7 @@ public class Recipe extends BaseEntity {
     @Immutable
     private User author;
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, fetch = FetchType.LAZY)
     @JoinTable(
             name = "group_recipe",
             joinColumns = @JoinColumn(name = "recipe_id"),

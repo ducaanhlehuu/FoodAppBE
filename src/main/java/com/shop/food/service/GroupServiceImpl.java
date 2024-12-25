@@ -23,7 +23,11 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<Group> getAllGroupByUserEmail(String email) {
-        return groupReposistory.getGroupsByUserEmail(email);
+        List<Group> groups = groupReposistory.getGroupsByUserEmail(email);
+        for (Group group: groups) {
+            group.setGroupRecipes(groupRecipeRepository.findByGroupId(group.getId()));
+        }
+        return groups;
     }
 
     @Override

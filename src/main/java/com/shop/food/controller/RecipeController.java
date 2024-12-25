@@ -67,7 +67,7 @@ public class RecipeController {
         try {
             recipeService.deleteRecipe(id);
             ResponseBody response = new ResponseBody("Recipe deleted successfully", ResponseBody.DELETED, null);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (ResourceNotFoundException e) {
             ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.NOT_FOUND, null);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
@@ -106,8 +106,7 @@ public class RecipeController {
         }
     }
 
-    @Operation(summary = "Share a Recipe to other Group",
-            description = "Gets the details of a Recipe by its ID.")
+    @Operation(summary = "Share a Recipe to other Group")
     @PostMapping("/share/{recipeId}/{groupId}")
     public ResponseEntity<ResponseBody> shareRecipe(
             @PathVariable("recipeId") @Parameter(description = "ID of the Recipe to retrieve") Integer recipeId,
@@ -115,6 +114,21 @@ public class RecipeController {
         try {
             recipeService.shareRecipeToGroup(recipeId, groupId);
             ResponseBody response = new ResponseBody("Recipe share successfully", ResponseBody.SUCCESS, "");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.SERVER_ERROR, null);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @Operation(summary = "Remove a Recipe from a Group")
+    @PostMapping("/remove/{recipeId}/{groupId}")
+    public ResponseEntity<ResponseBody> removeRecipeOfGroup(
+            @PathVariable("recipeId") @Parameter(description = "ID of the Recipe to remove") Integer recipeId,
+            @PathVariable("groupId") @Parameter(description = "ID of the Group") Integer groupId ) throws UnauthorizedException, ResourceNotFoundException {
+        try {
+            recipeService.removeRecipeOfGroup(recipeId, groupId);
+            ResponseBody response = new ResponseBody("Recipe remove successfully", ResponseBody.SUCCESS, "");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ResponseBody response = new ResponseBody(e.getMessage(), ResponseBody.SERVER_ERROR, null);

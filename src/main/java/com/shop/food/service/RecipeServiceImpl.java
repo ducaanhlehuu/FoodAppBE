@@ -12,6 +12,7 @@ import com.shop.food.service.iservice.RecipeService;
 import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -125,5 +126,22 @@ public class RecipeServiceImpl implements RecipeService {
                 groupId -> recipes.addAll(recipeRepository.findRecipesByGroupId(groupId))
         );
         return recipes;
+    }
+
+    @Override
+    public void removeRecipeOfGroup(Integer recipeId, Integer groupId) throws UnauthorizedException, ResourceNotFoundException {
+        boolean valid = serverUtil.checkUserInGroup(groupId);
+        if (valid) {
+            Recipe recipe = this.getRecipeById(recipeId);
+            if (recipe !=null) {
+                GroupRecipe groupRecipe = groupRecipeRepository.findByGroupIdAndRecipeId(groupId, recipeId);
+                if (groupRecipe == null) {
+                    throw new IllegalArgumentException("This group is not have this recipe now");
+                }
+                else {
+                    groupRecipeRepository.delete(groupRecipe);
+                }
+            }
+        }
     }
 }

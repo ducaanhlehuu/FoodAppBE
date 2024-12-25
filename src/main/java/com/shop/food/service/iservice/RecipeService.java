@@ -16,4 +16,5 @@ public interface RecipeService {
     void shareRecipeToGroup(Integer recipeId, Integer groupId) throws UnauthorizedException, ResourceNotFoundException;
     List<Recipe> getRecipesInGroup(Integer groupId);
     List<Recipe> getRecipesByUser() throws UnauthorizedException;
+    void removeRecipeOfGroup(Integer recipeId, Integer groupId) throws UnauthorizedException, ResourceNotFoundException;
 }
