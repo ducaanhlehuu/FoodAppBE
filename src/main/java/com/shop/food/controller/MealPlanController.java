@@ -37,7 +37,7 @@ public class MealPlanController {
     })
     @PostMapping
     public ResponseEntity<ResponseBody> createMealPlan(
-            @RequestBody @Parameter(description = "Details of the MealPlan to be created") MealPlanDto mealPlanDto) {
+            @RequestBody @Parameter(description = "Details of the MealPlan to be created") MealPlanDto mealPlanDto) throws UnauthorizedException {
         MealPlan createdMealPlan = mealPlanService.createMealPlan(mealPlanDto);
         ResponseBody responseBody = new ResponseBody("MealPlan created successfully", ResponseBody.SUCCESS, createdMealPlan);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseBody);

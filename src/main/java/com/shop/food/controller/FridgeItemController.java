@@ -4,6 +4,7 @@ import com.shop.food.dto.FridgeItemDto;
 import com.shop.food.entity.meal.FridgeItem;
 import com.shop.food.entity.response.ResponseBody;
 import com.shop.food.exception.ResourceNotFoundException;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.service.iservice.FridgeItemService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +20,7 @@ public class FridgeItemController {
     private final FridgeItemService fridgeItemService;
 
     @PostMapping
-    public ResponseEntity<ResponseBody> createFridgeItem(@RequestBody FridgeItemDto fridgeItemDto) throws ResourceNotFoundException {
+    public ResponseEntity<ResponseBody> createFridgeItem(@RequestBody FridgeItemDto fridgeItemDto) throws ResourceNotFoundException, UnauthorizedException {
         FridgeItem createdItem = fridgeItemService.createFridgeItem(fridgeItemDto);
         return new ResponseEntity<>(new ResponseBody("Fridge item created successfully", ResponseBody.SUCCESS, createdItem), HttpStatus.OK);
     }

@@ -6,11 +6,13 @@ import com.shop.food.entity.meal.MealPlan;
 import com.shop.food.entity.meal.STATUS;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.repository.FoodRepository;
 import com.shop.food.repository.GroupRepository;
 import com.shop.food.repository.MealPlanRepository;
 import com.shop.food.repository.UserRepository;
 import com.shop.food.service.iservice.MealPlanService;
+import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +31,11 @@ public class MealPlanServiceImpl implements MealPlanService {
     private final FoodRepository foodRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final ServerUtil serverUtil;
     private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
     @Override
-    public MealPlan createMealPlan(MealPlanDto mealPlanDto) {
+    public MealPlan createMealPlan(MealPlanDto mealPlanDto) throws UnauthorizedException {
         MealPlan mealPlan = new MealPlan();
         mealPlan.setName(mealPlanDto.getName());
         try {
@@ -51,13 +54,7 @@ public class MealPlanServiceImpl implements MealPlanService {
         } else {
             throw new RuntimeException("Food not found with id: " + mealPlanDto.getFoodId());
         }
-
-        if (userRepository.existsById(mealPlanDto.getOwnerId())) {
-            User owner = User.builder().id(mealPlanDto.getOwnerId()).build();
-            mealPlan.setOwner(owner);
-        } else {
-            throw new RuntimeException("Owner not found with id: " + mealPlanDto.getOwnerId());
-        }
+        mealPlan.setOwner(serverUtil.getCurrentUser());
 
         return mealPlanRepository.save(mealPlan);
     }
@@ -81,13 +78,6 @@ public class MealPlanServiceImpl implements MealPlanService {
             existingMealPlan.setFood(food);
         } else {
             throw new RuntimeException("Food not found with id: " + mealPlanDto.getFoodId());
-        }
-
-        if (userRepository.existsById(mealPlanDto.getOwnerId())) {
-            User owner = User.builder().id(mealPlanDto.getOwnerId()).build();
-            existingMealPlan.setOwner(owner);
-        } else {
-            throw new RuntimeException("Owner not found with id: " + mealPlanDto.getOwnerId());
         }
 
         return mealPlanRepository.save(existingMealPlan);

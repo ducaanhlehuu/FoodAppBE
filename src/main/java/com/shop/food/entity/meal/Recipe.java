@@ -33,7 +33,6 @@ public class Recipe extends BaseEntity {
 
     @ManyToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "food_id")
-    @Immutable
     private Food food;
 
     private List<Integer> rawMaterialIds = new ArrayList<>();

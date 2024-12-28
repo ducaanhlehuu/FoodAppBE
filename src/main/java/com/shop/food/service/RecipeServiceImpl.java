@@ -58,6 +58,7 @@ public class RecipeServiceImpl implements RecipeService {
         recipe.setDescription(recipeDto.getDescription());
         recipe.setHtmlContent(recipeDto.getHtmlContent());
         recipe.setRawMaterialIds(recipeDto.getRawMaterialIds());
+
         if (foodRepository.existsById(recipeDto.getFoodId())) {
             recipe.setFood(foodRepository.findById(recipeDto.getFoodId()).get());
         } else {

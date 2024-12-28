@@ -6,6 +6,7 @@ import com.shop.food.entity.meal.FridgeItem;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.ResourceNotFoundException;
+import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.repository.FridgeItemRepository;
 import com.shop.food.repository.FoodRepository;
 import com.shop.food.repository.GroupRepository;
@@ -24,10 +25,12 @@ public class FridgeItemServiceImpl implements FridgeItemService {
     private final FoodRepository foodRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
+    private final ServerUtil serverUtil;
 
     @Override
-    public FridgeItem createFridgeItem(FridgeItemDto fridgeItemDto) throws ResourceNotFoundException {
+    public FridgeItem createFridgeItem(FridgeItemDto fridgeItemDto) throws ResourceNotFoundException, UnauthorizedException {
         FridgeItem fridgeItem = mapDtoToEntity(fridgeItemDto);
+        fridgeItem.setOwner(serverUtil.getCurrentUser());
         return fridgeItemRepository.save(fridgeItem);
     }
 
@@ -67,7 +70,9 @@ public class FridgeItemServiceImpl implements FridgeItemService {
         FridgeItem fridgeItem = new FridgeItem();
         fridgeItem.setFoodName(fridgeItemDto.getFoodName());
         fridgeItem.setQuantity(fridgeItemDto.getQuantity());
-        fridgeItem.setExpiredDate(new Date(new Date().getTime() + fridgeItemDto.getUseWithin() * 1000L));
+        if (fridgeItemDto.getUseWithin()!= null && fridgeItemDto.getUseWithin() != 0) {
+            fridgeItem.setExpiredDate(new Date(new Date().getTime() + fridgeItemDto.getUseWithin() * 1000L));
+        }
         fridgeItem.setNote(fridgeItemDto.getNote());
 
         if (fridgeItemDto.getFoodId() != null) {
@@ -76,14 +81,6 @@ public class FridgeItemServiceImpl implements FridgeItemService {
             }
             else {
                 throw new ResourceNotFoundException("Food not found with ID: " + fridgeItemDto.getFoodId());
-            }
-        }
-        if (fridgeItemDto.getOwnerId() != null) {
-            if (userRepository.existsById(fridgeItemDto.getOwnerId())) {
-                fridgeItem.setOwner(User.builder().id(fridgeItemDto.getOwnerId()).build());
-            }
-            else {
-                throw new ResourceNotFoundException("User not found with ID: " + fridgeItemDto.getOwnerId());
             }
         }
         return fridgeItem;

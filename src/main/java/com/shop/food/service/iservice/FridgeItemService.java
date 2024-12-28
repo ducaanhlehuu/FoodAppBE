@@ -3,11 +3,12 @@ package com.shop.food.service.iservice;
 import com.shop.food.dto.FridgeItemDto;
 import com.shop.food.entity.meal.FridgeItem;
 import com.shop.food.exception.ResourceNotFoundException;
+import com.shop.food.exception.UnauthorizedException;
 
 import java.util.List;
 
 public interface FridgeItemService {
-    FridgeItem createFridgeItem(FridgeItemDto fridgeItem) throws ResourceNotFoundException;
+    FridgeItem createFridgeItem(FridgeItemDto fridgeItem) throws ResourceNotFoundException, UnauthorizedException;
 
     FridgeItem updateFridgeItem(Integer fridgeItemId, FridgeItemDto fridgeItem) throws ResourceNotFoundException;
 
