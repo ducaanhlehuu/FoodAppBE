@@ -21,4 +21,6 @@ public interface ShoppingListTaskService {
     List<Task> createTasks(List<TaskDto> taskDtos, Integer listId) throws ResourceNotFoundException;
     Task updateTask(Integer taskId, TaskDto taskDto) throws ResourceNotFoundException;
     void deleteTask(Integer taskId);
+    
+    List<ShoppingList> getReportOfUser(Integer userId, Integer day);
 }

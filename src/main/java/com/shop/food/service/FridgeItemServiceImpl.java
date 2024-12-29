@@ -7,6 +7,7 @@ import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.ResourceNotFoundException;
 import com.shop.food.exception.UnauthorizedException;
+import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.repository.FridgeItemRepository;
 import com.shop.food.repository.FoodRepository;
 import com.shop.food.repository.GroupRepository;
@@ -31,6 +32,7 @@ public class FridgeItemServiceImpl implements FridgeItemService {
     public FridgeItem createFridgeItem(FridgeItemDto fridgeItemDto) throws ResourceNotFoundException, UnauthorizedException {
         FridgeItem fridgeItem = mapDtoToEntity(fridgeItemDto);
         fridgeItem.setOwner(serverUtil.getCurrentUser());
+        fridgeItem.setStatus(FridgeItem.STATUS_WAITING);
         return fridgeItemRepository.save(fridgeItem);
     }
 
@@ -45,25 +47,67 @@ public class FridgeItemServiceImpl implements FridgeItemService {
 
     @Override
     public void deleteFridgeItem(Integer fridgeItemId) throws ResourceNotFoundException {
-        if (!fridgeItemRepository.existsById(fridgeItemId)) {
-            throw new ResourceNotFoundException("FridgeItem not found with ID: " + fridgeItemId);
-        }
-        fridgeItemRepository.deleteById(fridgeItemId);
+        FridgeItem fridgeItem = getFridgeItemById(fridgeItemId);
+        fridgeItem.setStatus(FridgeItem.STATUS_CANCELED);
+        fridgeItemRepository.save(fridgeItem);
     }
 
     @Override
     public FridgeItem getFridgeItemById(Integer fridgeItemId) throws ResourceNotFoundException {
-        return fridgeItemRepository.findById(fridgeItemId)
+        FridgeItem fridgeItem = fridgeItemRepository.findById(fridgeItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("FridgeItem not found with ID: " + fridgeItemId));
+        updateStatus(fridgeItem);
+        fridgeItemRepository.save(fridgeItem);
+        return fridgeItem;
     }
     @Override
     public List<FridgeItem> getFridgeItemsByGroupId(Integer groupId) {
-        return fridgeItemRepository.findByGroupId(groupId);
+        List<FridgeItem> fridgeItems = fridgeItemRepository.findByGroupId(groupId);
+        for (FridgeItem fridgeItem: fridgeItems) {
+            updateStatus(fridgeItem);
+        }
+        return filterFridgeItem(fridgeItemRepository.saveAll(fridgeItems));
     }
 
     @Override
     public List<FridgeItem> getFridgeItemsByFoodId(Integer foodId) {
-        return fridgeItemRepository.findByFoodId(foodId);
+        List<FridgeItem> fridgeItems = fridgeItemRepository.findByFoodId(foodId);
+        for (FridgeItem fridgeItem: fridgeItems) {
+            updateStatus(fridgeItem);
+        }
+        return filterFridgeItem(fridgeItemRepository.saveAll(fridgeItems));
+    }
+
+    @Override
+    public FridgeItem updateStatus(Integer fridgeItemId, String newStatus) throws ResourceNotFoundException {
+        if (!FridgeItem.getAllStatus().contains(newStatus)) {
+            throw new IllegalArgumentException("Status not valid: " + newStatus);
+        }
+        if (newStatus.equals(FridgeItem.STATUS_CANCELED))
+            throw new IllegalArgumentException("This fridge item have been cancelled so cannot update anymore");
+        FridgeItem fridgeItem = getFridgeItemById(fridgeItemId);
+
+        if (fridgeItem.getStatus().equals(FridgeItem.STATUS_WAITING)) {
+            if (!newStatus.equals(FridgeItem.STATUS_EXPIRED)) {
+                fridgeItem.setStatus(newStatus);
+            }
+        } else {
+            fridgeItem.setStatus(newStatus);
+        }
+        return fridgeItemRepository.save(fridgeItem);
+    }
+
+    @Override
+    public List<FridgeItem> getReportOfUser(Integer userId, Integer day) throws UserNotFoundException {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null)
+            throw new UserNotFoundException("Not found user");
+        List<FridgeItem> fridgeItems = new ArrayList<>();
+        for (Integer groupId: user.getGroupIds()) {
+            fridgeItems.addAll(getFridgeItemsByGroupId(groupId));
+        }
+
+        return filterFridgeItem(fridgeItems);
     }
 
     private FridgeItem mapDtoToEntity(FridgeItemDto fridgeItemDto) throws ResourceNotFoundException {
@@ -85,4 +129,22 @@ public class FridgeItemServiceImpl implements FridgeItemService {
         }
         return fridgeItem;
     }
+
+    private void updateStatus(FridgeItem fridgeItem) {
+        Date now = new Date();
+        if (fridgeItem.getExpiredDate().getTime() < now.getTime()) {
+           if (fridgeItem.getStatus().equals(FridgeItem.STATUS_WAITING)) {
+               fridgeItem.setStatus(FridgeItem.STATUS_EXPIRED);
+           }
+        } else {
+            if (fridgeItem.getStatus().equals(FridgeItem.STATUS_EXPIRED)) {
+                fridgeItem.setStatus(FridgeItem.STATUS_WAITING);
+            }
+        }
+    }
+
+    private List<FridgeItem> filterFridgeItem(List<FridgeItem> fridgeItems) {
+        return fridgeItems.stream().filter(item-> !item.getStatus().equals(FridgeItem.STATUS_CANCELED)).toList();
+    }
+
 }

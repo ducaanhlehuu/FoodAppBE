@@ -33,7 +33,7 @@ public class MealPlan extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private STATUS status; //
+    private STATUS status;
 
     @ManyToOne
     @JoinColumn(name = "food_id")
@@ -58,8 +58,4 @@ public class MealPlan extends BaseEntity {
         }
         return null;
     }
-
-//    public Map<Integer, String> getStatusNameMap() {
-//        return new Hash
-//    };
 }

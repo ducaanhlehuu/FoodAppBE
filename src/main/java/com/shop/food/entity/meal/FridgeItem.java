@@ -12,7 +12,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Immutable;
 
-import java.util.Date;
+import java.util.*;
 
 import java.util.Date;
 
@@ -23,10 +23,12 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FridgeItem extends BaseEntity {
+
     private String foodName;
     private Integer quantity;
     private Date expiredDate;
     private String note;
+    private String status = FridgeItem.STATUS_WAITING;
 
     @ManyToOne
     @JoinColumn(name = "food_id", nullable = false)
@@ -38,11 +40,27 @@ public class FridgeItem extends BaseEntity {
     @Immutable
     private User owner;
 
+    @JsonIgnore public static String STATUS_EXPIRED = "EXPIRED";
+    @JsonIgnore public static String STATUS_CANCELED = "CANCELED";
+    @JsonIgnore public static String STATUS_DONE = "DONE";
+    @JsonIgnore public static String STATUS_WAITING = "WAITING";
+
     @JsonProperty("group_id")
     public Integer getGroupId() {
         if (food!=null && food.getGroup()!=null) {
             return food.getGroup().getId();
         }
         return null;
+    }
+
+    public static List<String> getAllStatus(){
+        return new ArrayList<>(Arrays.asList(STATUS_EXPIRED, STATUS_CANCELED, STATUS_DONE, STATUS_WAITING));
+    }
+
+    public String getStatus() {
+        if (status == null) {
+            status = FridgeItem.STATUS_WAITING;
+        }
+        return status;
     }
 }

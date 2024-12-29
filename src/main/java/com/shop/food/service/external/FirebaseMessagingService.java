@@ -15,7 +15,6 @@ public class FirebaseMessagingService {
     private FirebaseMessaging firebaseMessaging;
 
     public String sendNotification(NotificationMessage notificationMessage) throws Exception {
-        System.out.println("huhuhh");
         Message message = Message.builder()
                 .setNotification(Notification.builder()
                         .setTitle(notificationMessage.getTitle())
@@ -23,7 +22,6 @@ public class FirebaseMessagingService {
                         .setImage(notificationMessage.getImage())
                         .build())
                 .setToken(notificationMessage.getRecipientToken())
-//                .putAllData(notificationMessage.getData())
                 .build();
 
         try {

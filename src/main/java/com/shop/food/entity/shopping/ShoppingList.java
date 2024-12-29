@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = false)
@@ -24,7 +25,7 @@ import java.util.List;
 public class ShoppingList extends BaseEntity {
     private String name;
     private String note;
-    private String date;
+    private Date date;
 
     @ManyToOne
     @JoinColumn(name="assign_to_user_id")

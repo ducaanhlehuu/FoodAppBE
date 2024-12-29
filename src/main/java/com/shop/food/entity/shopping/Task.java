@@ -34,6 +34,12 @@ public class Task extends BaseEntity {
     public Integer getFoodId() {
         return food != null ? food.getId() : null;
     }
+    public String getFoodName() {
+        return food != null ? food.getName() : "";
+    }
+    public String getFoodImage() {
+        return food != null ? food.getImageUrl() : "";
+    }
     @JsonProperty("shopping_list_id")
     public Integer getShoppingListId() {
         return shoppingList != null ? shoppingList.getId() : null;

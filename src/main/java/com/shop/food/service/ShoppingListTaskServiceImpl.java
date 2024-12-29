@@ -18,8 +18,14 @@ import com.shop.food.service.iservice.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +36,7 @@ public class ShoppingListTaskServiceImpl implements ShoppingListTaskService {
     private final UserService userService;
     private final GroupService groupService;
     private final FoodService foodService;
+    private static final SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     @Override
     public ShoppingList createShoppingList(ShoppingListDto shoppingListDto) throws UserNotFoundException {
@@ -38,7 +45,14 @@ public class ShoppingListTaskServiceImpl implements ShoppingListTaskService {
         ShoppingList shoppingList = new ShoppingList();
         shoppingList.setName(shoppingListDto.getName());
         shoppingList.setNote(shoppingListDto.getNote());
-        shoppingList.setDate(shoppingListDto.getDate());
+
+        try {
+            Date parsedDate = dateFormatter.parse(shoppingListDto.getDate());
+            shoppingList.setDate(parsedDate);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd. Ex: 2024-12-01");
+        }
+
         shoppingList.setOwner(new User(shoppingListDto.getOwnerId()));
 
         if (shoppingListDto.getAssignToUserId() != null) {
@@ -60,7 +74,13 @@ public class ShoppingListTaskServiceImpl implements ShoppingListTaskService {
 
         shoppingList.setName(updateRequest.getName());
         shoppingList.setNote(updateRequest.getNote());
-        shoppingList.setDate(updateRequest.getDate());
+
+        try {
+            Date parsedDate = dateFormatter.parse(updateRequest.getDate());
+            shoppingList.setDate(parsedDate);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Invalid date format. Expected yyyy-MM-dd. Ex: 2024-12-01");
+        }
 
         if (updateRequest.getAssignToUserId() != null) {
             shoppingList.setAssignToUser(new User(updateRequest.getAssignToUserId()));
@@ -143,5 +163,21 @@ public class ShoppingListTaskServiceImpl implements ShoppingListTaskService {
     @Override
     public void deleteTask(Integer taskId) {
         taskRepository.deleteById(taskId);
+    }
+
+    @Override
+    public List<ShoppingList> getReportOfUser(Integer userId, Integer day) {
+        List<ShoppingList> shoppingLists = getShoppingListByUserId(userId);
+        LocalDate today = LocalDate.now();
+
+        return shoppingLists.stream()
+                .filter(item -> {
+                    LocalDate itemDate = item.getDate().toInstant()
+                            .atZone(java.time.ZoneId.systemDefault())
+                            .toLocalDate();
+                    long daysBetween = ChronoUnit.DAYS.between(itemDate, today);
+                    return Math.abs(daysBetween) <= day;
+                })
+                .collect(Collectors.toList());
     }
 }

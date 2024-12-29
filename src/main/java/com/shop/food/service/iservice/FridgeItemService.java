@@ -4,6 +4,7 @@ import com.shop.food.dto.FridgeItemDto;
 import com.shop.food.entity.meal.FridgeItem;
 import com.shop.food.exception.ResourceNotFoundException;
 import com.shop.food.exception.UnauthorizedException;
+import com.shop.food.exception.UserNotFoundException;
 
 import java.util.List;
 
@@ -20,4 +21,7 @@ public interface FridgeItemService {
 
     List<FridgeItem> getFridgeItemsByFoodId(Integer foodId);
 
+    FridgeItem updateStatus(Integer fridgeItemId, String newStatus) throws ResourceNotFoundException;
+
+    List<FridgeItem> getReportOfUser(Integer userId, Integer day) throws UserNotFoundException;
 }

@@ -10,6 +10,8 @@ import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.service.external.FirebaseMessagingService;
 import com.shop.food.service.external.S3Service;
+import com.shop.food.service.iservice.FridgeItemService;
+import com.shop.food.service.iservice.ShoppingListTaskService;
 import com.shop.food.service.iservice.UserService;
 import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.shop.food.util.ServerUtil.getAuthenticatedUserEmail;
@@ -33,6 +36,9 @@ public class UserController {
     private final UserService userService;
     private final S3Service s3Service;
     private final FirebaseMessagingService firebaseMessagingService;
+    private final ShoppingListTaskService shoppingListTaskService;
+    private final FridgeItemService fridgeItemService;
+    private final ServerUtil serverUtil;
 
     @PutMapping("/edit/profile")
     public ResponseEntity<ResponseBody> editProfile(@RequestBody UserProfileUpdateRequest updateRequest) {
@@ -140,4 +146,23 @@ public class UserController {
        data.put("photoUrl",user.getPhotoUrl());
        return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS).resultMessage("Found user").data(data).build());
     }
+
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/getAll")
+    public ResponseEntity<ResponseBody> getAllUser() throws UserNotFoundException {
+        List<User> users = userService.getAllUser();
+        return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS).resultMessage("Found user").data(users).build());
+    }
+
+    @GetMapping("/report/{day}")
+    public ResponseEntity<ResponseBody> getReportByDay(@PathVariable("day") Integer day) throws UserNotFoundException, UnauthorizedException {
+        User currenntUser = serverUtil.getCurrentUser();
+        Map<String, Object> data= new HashMap<>();
+        data.put("shoppingLists",shoppingListTaskService.getReportOfUser(currenntUser.getId(), day));
+        data.put("fridgeItems", fridgeItemService.getReportOfUser(currenntUser.getId(), day));
+
+        return ResponseEntity.ok(ResponseBody.builder().resultCode(ResponseBody.SUCCESS).resultMessage("Get Report success").data(data).build());
+    }
+
 }

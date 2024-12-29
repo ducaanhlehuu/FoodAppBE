@@ -55,4 +55,10 @@ public class FridgeItemController {
         return new ResponseEntity<>(new ResponseBody("Fridge items by Food fetched successfully", ResponseBody.SUCCESS, items), HttpStatus.OK);
     }
 
+    @PostMapping("/{fridgeItemId}/{status}")
+    public ResponseEntity<ResponseBody> updateFridgeItemStatus(@PathVariable("fridgeItemId") Integer fridgeItemId, @PathVariable("status") String newStatus) throws ResourceNotFoundException {
+        FridgeItem updatedItem = fridgeItemService.updateStatus(fridgeItemId,newStatus);
+        return new ResponseEntity<>(new ResponseBody("Fridge item update status successfully", ResponseBody.SUCCESS, updatedItem), HttpStatus.OK);
+    }
+
 }
