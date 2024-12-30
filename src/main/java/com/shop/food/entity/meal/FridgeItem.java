@@ -1,6 +1,7 @@
 package com.shop.food.entity.meal;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.shop.food.entity.BaseEntity;
@@ -26,6 +27,7 @@ public class FridgeItem extends BaseEntity {
 
     private String foodName;
     private Integer quantity;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm", timezone = "Asia/Ho_Chi_Minh")
     private Date expiredDate;
     private String note;
     private String status = FridgeItem.STATUS_WAITING;

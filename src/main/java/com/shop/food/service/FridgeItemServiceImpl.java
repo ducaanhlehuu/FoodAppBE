@@ -115,7 +115,7 @@ public class FridgeItemServiceImpl implements FridgeItemService {
         fridgeItem.setFoodName(fridgeItemDto.getFoodName());
         fridgeItem.setQuantity(fridgeItemDto.getQuantity());
         if (fridgeItemDto.getUseWithin()!= null && fridgeItemDto.getUseWithin() != 0) {
-            fridgeItem.setExpiredDate(new Date(new Date().getTime() + fridgeItemDto.getUseWithin() * 1000L));
+            fridgeItem.setExpiredDate(new Date(new Date().getTime() + fridgeItemDto.getUseWithin() * 1000L * 60));
         }
         fridgeItem.setNote(fridgeItemDto.getNote());
 
