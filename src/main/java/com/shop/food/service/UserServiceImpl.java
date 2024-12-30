@@ -5,6 +5,7 @@ import com.shop.food.exception.PasswordNotMatchException;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.repository.UserRepository;
 import com.shop.food.service.iservice.UserService;
+import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         user.setPassword(existedUser.getPassword());
-        return user;
+        return userReposistory.save(user);
     }
 
     @Override
@@ -53,6 +54,7 @@ public class UserServiceImpl implements UserService {
             throw new PasswordNotMatchException("PassWord not match");
         }
         existedUser.setPassword(encoder.encode(newPassWord));
+        userReposistory.save(existedUser);
     }
 
     @Override
