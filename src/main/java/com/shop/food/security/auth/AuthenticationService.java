@@ -45,7 +45,7 @@ public class AuthenticationService {
             var user = reposistory.findByEmail(request.getEmail())
                     .orElseThrow(() -> new UnauthorizedException("User not found."));
             var jwtToken = jwtService.generateToken(user);
-            return AuthenticationResponse.builder().token(jwtToken).build();
+            return AuthenticationResponse.builder().token(jwtToken).role(user.getRole().name()).user(user).build();
 
         } catch (BadCredentialsException ex) {
             throw new UnauthorizedException("Invalid email or password.");
