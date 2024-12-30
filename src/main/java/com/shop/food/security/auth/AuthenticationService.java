@@ -5,6 +5,7 @@ import com.shop.food.entity.user.User;
 import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.repository.UserRepository;
 import com.shop.food.security.JWTService;
+import com.shop.food.service.external.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,6 +21,7 @@ public class AuthenticationService {
     private final PasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
+    private final EmailService emailService;
 
     public AuthenticationResponse register(RegisterRequest request) {
 
@@ -33,6 +35,14 @@ public class AuthenticationService {
                         .role(Role.USER).build();
         reposistory.save(user);
         var jwtToken = jwtService.generateToken(user);
+        try {
+            return AuthenticationResponse.builder().token(jwtToken).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            emailService.sendEmail(user.getEmail(), "Chào mừng bạn",
+                    "Cảm ơn bạn <b>" + user.getFullName() + "</b> đã đến với ứng dụng Foodie của chúng tôi. Chúc bạn có những trải nghiệm tốt nhất cùng gia đình!");
+        }
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 
