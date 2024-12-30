@@ -31,6 +31,9 @@ public class FridgeItemServiceImpl implements FridgeItemService {
     @Override
     public FridgeItem createFridgeItem(FridgeItemDto fridgeItemDto) throws ResourceNotFoundException, UnauthorizedException {
         FridgeItem fridgeItem = mapDtoToEntity(fridgeItemDto);
+        if (fridgeItem.getExpiredDate() == null) {
+            throw new IllegalArgumentException("No expired date!");
+        }
         fridgeItem.setOwner(serverUtil.getCurrentUser());
         fridgeItem.setStatus(FridgeItem.STATUS_WAITING);
         return fridgeItemRepository.save(fridgeItem);
