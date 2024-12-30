@@ -1,12 +1,16 @@
 package com.shop.food.service;
 
+import com.shop.food.dto.NotificationMessage;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
 import com.shop.food.repository.GroupRecipeRepository;
 import com.shop.food.repository.GroupRepository;
 import com.shop.food.repository.UserRepository;
+import com.shop.food.service.external.EmailService;
+import com.shop.food.service.external.FirebaseMessagingService;
 import com.shop.food.service.iservice.GroupService;
+import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -20,6 +24,8 @@ public class GroupServiceImpl implements GroupService {
     private final GroupRepository groupReposistory;
     private final GroupRecipeRepository groupRecipeRepository;
     private final UserRepository userReposistory;
+    private final EmailService emailService;
+    private final FirebaseMessagingService firebaseMessagingService;
 
     @Override
     public List<Group> getAllGroupByUserEmail(String email) {
@@ -88,6 +94,19 @@ public class GroupServiceImpl implements GroupService {
             throw new IllegalStateException("User is already a member of the group");
         }
         group.getMembers().add(user);
+
+        if (user.getEmail().isEmpty()) {
+            emailService.sendEmail(user.getEmail(), "Thông báo tới bạn" ,"Bạn đã được thêm vào nhóm " + group.getName() + " bởi người dùng: " +  group.getOwner().getFullName() +" (" + group.getOwner().getEmail()+")");
+        }
+        try {
+            if (user.getNotificationToken()!=null && user.getNotificationToken().isEmpty()) {
+                NotificationMessage notificationMessage = NotificationMessage.builder().recipientToken(user.getNotificationToken())
+                        .title("Foodie App").body("Bạn đã được thêm vào nhóm " + group.getName() + " bởi người dùng: " +  group.getOwner().getFullName() +" (" + group.getOwner().getEmail()+")").build();
+                firebaseMessagingService.sendNotification(notificationMessage);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return this.saveGroup(group);
     }
 

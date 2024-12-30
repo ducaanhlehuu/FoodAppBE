@@ -101,7 +101,7 @@ public class GroupController {
     }
 
     @PostMapping("/{groupId}/members/{userId}")
-    public ResponseEntity<ResponseBody> addMemberToGroup(@PathVariable Integer groupId, @PathVariable Integer userId) throws UnauthorizedException {
+    public ResponseEntity<ResponseBody> addMemberToGroup(@PathVariable Integer groupId, @PathVariable Integer userId) throws Exception {
         String userEmail = ServerUtil.getAuthenticatedUserEmail();
         Group existedGroup = groupService.getGroup(groupId);
         checkGroupOwner(userEmail, existedGroup);

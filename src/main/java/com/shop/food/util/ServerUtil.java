@@ -1,9 +1,12 @@
 package com.shop.food.util;
 
+import com.shop.food.dto.NotificationMessage;
 import com.shop.food.entity.user.Group;
 import com.shop.food.entity.user.User;
 import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.exception.UserNotFoundException;
+import com.shop.food.service.external.EmailService;
+import com.shop.food.service.external.FirebaseMessagingService;
 import com.shop.food.service.iservice.GroupService;
 import com.shop.food.service.iservice.UserService;
 import jakarta.persistence.EntityManager;
@@ -27,6 +30,11 @@ public class ServerUtil {
     private GroupService groupService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private FirebaseMessagingService firebaseMessagingService;
+
 
     public static String getAuthenticatedUserEmail() throws UnauthorizedException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -61,4 +69,12 @@ public class ServerUtil {
         String email = ServerUtil.getAuthenticatedUserEmail();
         return userService.getUserByEmail(email);
     }
+
+//    public void sendEmail(String to, String title, String htmlContent) {
+//        emailService.sendEmail(to,title,htmlContent);
+//    }
+//
+//    public void sendNotification(NotificationMessage notificationMessage) throws Exception {
+//        firebaseMessagingService.sendNotification(notificationMessage);
+//    }
 }

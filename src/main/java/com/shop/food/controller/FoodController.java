@@ -21,7 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,35 +38,39 @@ public class FoodController {
     private final S3Service s3Service;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseBody> createFood(@ModelAttribute FoodDto foodDto) throws UnauthorizedException {
+    public ResponseEntity<ResponseBody> createFood(@RequestBody FoodDto foodDto) throws UnauthorizedException {
         String email = ServerUtil.getAuthenticatedUserEmail();
         User user = userService.getUserByEmail(email);
         if(user == null) {
             return new ResponseEntity<>(new ResponseBody("User not found", ResponseBody.NOT_FOUND, null), HttpStatus.BAD_REQUEST);
         }
         foodDto.setOwnerId(user.getId());
-        String imageUrl = null;
-        if (foodDto.getImage() != null && !foodDto.getImage().isEmpty()) {
-            imageUrl = s3Service.uploadFile(foodDto.getImage(), "food/" , foodDto.getGroupId() +"/" +  foodDto.getName().toLowerCase() + new Date().getTime());
-            if (imageUrl == null) {
-                return new ResponseEntity<>(new ResponseBody("Upload image exception", ResponseBody.SERVER_ERROR, ""), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
 
-        Food createdFood = foodService.createFood(foodDto, imageUrl );
+        Food createdFood = foodService.createFood(foodDto, foodDto.getImageUrl() );
         return new ResponseEntity<>(new ResponseBody("Food created successfully", ResponseBody.SUCCESS, createdFood), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{foodId}")
-    public ResponseEntity<ResponseBody> updateFood(@ModelAttribute FoodDto foodDto, @PathVariable("foodId") Integer foodId) {
-        String imageUrl = null;
-        if (foodDto.getImage() != null && !foodDto.getImage().isEmpty()) {
-            imageUrl = s3Service.uploadFile(foodDto.getImage(), "food/" , foodDto.getGroupId() +"/" +  foodDto.getName().toLowerCase() + new Date().getTime());
-            if (imageUrl == null) {
-                return new ResponseEntity<>(new ResponseBody("Upload image exception", ResponseBody.SERVER_ERROR, ""), HttpStatus.INTERNAL_SERVER_ERROR);
+    @PostMapping("/uploadImage")
+    public ResponseEntity<ResponseBody> uploadImage(@RequestParam("multipartFiles") List<MultipartFile> multipartFiles) throws UnauthorizedException {
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile multipartFile: multipartFiles) {
+            String imageUrl = "";
+            if (multipartFile != null) {
+                imageUrl = s3Service.uploadFile(multipartFile, "image/" , multipartFile.getOriginalFilename() + new Date().getTime());
+                if (imageUrl == null) {
+                    return new ResponseEntity<>(new ResponseBody("Upload image exception", ResponseBody.SERVER_ERROR, ""), HttpStatus.INTERNAL_SERVER_ERROR);
+                } else {
+                    imageUrls.add(imageUrl);
+                }
             }
         }
-        Food updatedFood = foodService.updateFood(foodDto, foodId, imageUrl);
+        return new ResponseEntity<>(new ResponseBody("Upload successfully", ResponseBody.SUCCESS, imageUrls), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/update/{foodId}")
+    public ResponseEntity<ResponseBody> updateFood(@RequestBody FoodDto foodDto, @PathVariable("foodId") Integer foodId) {
+        String imageUrl = null;
+        Food updatedFood = foodService.updateFood(foodDto, foodId, foodDto.getImageUrl());
         return new ResponseEntity<>(new ResponseBody("Food updated successfully", ResponseBody.SUCCESS, updatedFood), HttpStatus.OK);
     }
 

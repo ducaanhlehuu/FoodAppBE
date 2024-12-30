@@ -10,7 +10,7 @@ public class FoodDto  {
     private String name;
     private String type;
     private String description;
-    private MultipartFile image;
+    private String imageUrl;
     private Integer groupId;
     private Integer ownerId;
     private String unitName;
