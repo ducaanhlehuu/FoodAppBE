@@ -8,6 +8,7 @@ import com.shop.food.entity.user.User;
 import com.shop.food.exception.UnauthorizedException;
 import com.shop.food.exception.UserNotFoundException;
 import com.shop.food.service.iservice.GroupService;
+import com.shop.food.service.iservice.UserService;
 import com.shop.food.util.ServerUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ public class GroupController {
 
     private final GroupService groupService;
     private final UserDetailsService userDetailsService;
+    private final UserService userService;
 
     private void checkGroupOwner(String userEmail, Group group) throws UnauthorizedException {
         if (!group.getOwner().getEmail().equalsIgnoreCase(userEmail)) {
@@ -115,5 +117,14 @@ public class GroupController {
         Group group = groupService.removeMemberInGroup(groupId, userId);
         return new ResponseEntity<>(new ResponseBody("Remove member successfully", ResponseBody.DELETED, group), HttpStatus.OK);
     }
-    
+
+    @PostMapping("/{groupId}/members")
+    public ResponseEntity<ResponseBody> addMemberToGroup(@PathVariable Integer groupId, @RequestParam("email") String email) throws UnauthorizedException {
+        String userEmail = ServerUtil.getAuthenticatedUserEmail();
+        Group existedGroup = groupService.getGroup(groupId);
+        checkGroupOwner(userEmail, existedGroup);
+        User newMember = userService.getUserByEmail(email);
+        Group group = groupService.addMemberToGroup(groupId, newMember.getId());
+        return new ResponseEntity<>(new ResponseBody("Add new member successfully", ResponseBody.SUCCESS, group), HttpStatus.OK);
+    }
 }
